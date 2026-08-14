@@ -24,6 +24,8 @@ import SavedPlansPanel from '@/components/SavedPlansPanel';
 import AdminPanel from '@/components/AdminPanel';
 import LanguageSelector from '@/components/LanguageSelector';
 import RiskManagementPage from '@/components/rm/RiskManagementPage';
+import MonteCarloSimulatorPanel from '@/components/MonteCarloSimulatorPanel';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const VALIDATION_RUNS = 5;
 
@@ -42,6 +44,15 @@ function App() {
   const [test5xScore, setTest5xScore] = useState(0);
   const [test5xSaved, setTest5xSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<'simulator' | 'rmTester'>('simulator');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-neu-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  }, []);
 
   const t: TFunc = useCallback(
     (key: string, params?: Record<string, string | number>) => translate(lang, key, params),
@@ -174,7 +185,7 @@ function App() {
 
   return (
     <I18nContext.Provider value={{ lang, t, setLang }}>
-      <div className="min-h-screen bg-base-900" dir={dir}>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--neu-bg)' }} dir={dir}>
         <header className="relative z-50 border-b border-base-500/40 bg-base-800/50 backdrop-blur-md">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
             <div className="flex items-center gap-3">
@@ -208,6 +219,7 @@ function App() {
                 </button>
               </div>
               <LanguageSelector />
+              <ThemeToggle theme={theme} onToggle={toggleTheme} />
             </div>
           </div>
         </header>
@@ -276,6 +288,7 @@ function App() {
               )}
 
               <EquityCurve trades={trades} startingBalance={settings.startingBalance} />
+              <MonteCarloSimulatorPanel trades={trades} startingBalance={settings.startingBalance} />
             </div>
 
             <div className="space-y-5 lg:col-span-4">

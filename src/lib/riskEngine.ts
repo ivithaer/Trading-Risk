@@ -258,6 +258,95 @@ export function formatPercent(value: number): string {
   return `${sign}${value.toFixed(2)}%`;
 }
 
+export interface SimulatorMonteCarloResult {
+  numSimulations: number;
+  probProfit: number;
+  worstDrawdownPct: number;
+  probLargeLoss: number;
+  avgFinalBalance: number;
+  medianFinalBalance: number;
+  bestFinalBalance: number;
+  worstFinalBalance: number;
+  p5: number;
+  p25: number;
+  p50: number;
+  p75: number;
+  p95: number;
+  avgMaxDrawdownPct: number;
+  finalBalances: number[];
+  maxDrawdownPcts: number[];
+}
+
+export function runSimulatorMonteCarlo(
+  trades: Trade[],
+  startingBalance: number,
+  numSimulations: number,
+  largeLossThreshold = 50,
+): SimulatorMonteCarloResult {
+  const finalBalances: number[] = [];
+  const maxDrawdownPcts: number[] = [];
+  let profitCount = 0;
+  let largeLossCount = 0;
+
+  for (let s = 0; s < numSimulations; s++) {
+    const shuffled = [...trades];
+    for (let j = shuffled.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [shuffled[j], shuffled[k]] = [shuffled[k], shuffled[j]];
+    }
+
+    let balance = startingBalance;
+    let peak = startingBalance;
+    let maxDrawdownPct = 0;
+
+    for (const trade of shuffled) {
+      balance = Math.max(0, balance + trade.pnl);
+      peak = Math.max(peak, balance);
+      const dd = peak - balance;
+      const ddPct = peak > 0 ? (dd / peak) * 100 : 0;
+      if (ddPct > maxDrawdownPct) maxDrawdownPct = ddPct;
+    }
+
+    finalBalances.push(balance);
+    maxDrawdownPcts.push(maxDrawdownPct);
+
+    if (balance > startingBalance) profitCount++;
+    const lossPct = startingBalance > 0 ? ((startingBalance - balance) / startingBalance) * 100 : 0;
+    if (lossPct >= largeLossThreshold) largeLossCount++;
+  }
+
+  finalBalances.sort((a, b) => a - b);
+  maxDrawdownPcts.sort((a, b) => a - b);
+
+  const percentile = (arr: number[], p: number) => {
+    if (arr.length === 0) return 0;
+    const idx = Math.min(arr.length - 1, Math.floor((p / 100) * arr.length));
+    return arr[idx];
+  };
+
+  const avg = (arr: number[]) =>
+    arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+
+  return {
+    numSimulations,
+    probProfit: numSimulations > 0 ? (profitCount / numSimulations) * 100 : 0,
+    worstDrawdownPct: maxDrawdownPcts.length > 0 ? maxDrawdownPcts[maxDrawdownPcts.length - 1] : 0,
+    probLargeLoss: numSimulations > 0 ? (largeLossCount / numSimulations) * 100 : 0,
+    avgFinalBalance: avg(finalBalances),
+    medianFinalBalance: percentile(finalBalances, 50),
+    bestFinalBalance: finalBalances.length > 0 ? finalBalances[finalBalances.length - 1] : 0,
+    worstFinalBalance: finalBalances.length > 0 ? finalBalances[0] : 0,
+    p5: percentile(finalBalances, 5),
+    p25: percentile(finalBalances, 25),
+    p50: percentile(finalBalances, 50),
+    p75: percentile(finalBalances, 75),
+    p95: percentile(finalBalances, 95),
+    avgMaxDrawdownPct: avg(maxDrawdownPcts),
+    finalBalances,
+    maxDrawdownPcts,
+  };
+}
+
 export interface PlanRow {
   nickname: string | null;
   settings: Settings;

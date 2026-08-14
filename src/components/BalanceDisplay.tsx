@@ -29,29 +29,31 @@ export default function BalanceDisplay({
   const progress = maxTrades > 0 ? (tradeCount / maxTrades) * 100 : 0;
 
   return (
-    <div className="card relative overflow-hidden p-6">
+    <div className="neu-card relative overflow-hidden p-6">
       <div
-        className={`pointer-events-none absolute -top-20 left-1/2 h-40 w-80 -translate-x-1/2 rounded-full opacity-20 blur-3xl transition-colors duration-500 ${
-          lastResult === 'win' ? 'bg-profit' : lastResult === 'loss' ? 'bg-loss' : 'bg-gold'
+        className={`pointer-events-none absolute -top-20 left-1/2 h-40 w-80 -translate-x-1/2 rounded-full opacity-10 blur-3xl transition-colors duration-500 ${
+          lastResult === 'win' ? 'neu-bg-profit-soft' : lastResult === 'loss' ? 'neu-bg-loss-soft' : 'neu-bg-gold-soft'
         }`}
       />
       <div className="relative">
-        <div className="mb-1 flex items-center justify-center gap-2 text-ink-secondary">
-          <Wallet size={15} />
+        <div className="mb-2 flex items-center justify-center gap-2 neu-text-secondary">
+          <div className="neu-icon-box flex h-7 w-7 items-center justify-center">
+            <Wallet size={14} />
+          </div>
           <span className="text-sm font-medium">{t('balance.accountBalance')}</span>
         </div>
         <div className="text-center">
           <div
             key={balance}
             className={`animate-count-up font-mono text-5xl font-bold tracking-tight ${
-              isPositive ? 'text-ink-primary' : 'text-loss-light'
+              isPositive ? 'neu-text-primary' : 'neu-text-loss'
             }`}
           >
             ${formatCurrency(balance).replace('$', '')}
           </div>
           <div
-            className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${
-              isPositive ? 'bg-profit/10 text-profit' : 'bg-loss/10 text-loss-light'
+            className={`mt-3 inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold neu-pill ${
+              isPositive ? 'neu-text-profit' : 'neu-text-loss'
             }`}
           >
             {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
@@ -65,28 +67,31 @@ export default function BalanceDisplay({
           <div
             key={tradeCount}
             className={`animate-float-up pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 text-lg font-bold ${
-              lastResult === 'win' ? 'text-profit' : 'text-loss-light'
+              lastResult === 'win' ? 'neu-text-profit' : 'neu-text-loss'
             }`}
           >
             {lastResult === 'win' ? '+' : ''}
             {formatCurrency(lastPnl)}
           </div>
         )}
-        <div className="mt-5 space-y-2.5">
+        <div className="mt-6 space-y-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-ink-secondary">{t('balance.nextRisk')}</span>
-            <span className="font-mono font-semibold text-gold">{formatCurrency(currentRiskAmount)}</span>
+            <span className="neu-text-secondary">{t('balance.nextRisk')}</span>
+            <span className="font-mono font-semibold neu-text-gold">{formatCurrency(currentRiskAmount)}</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-ink-secondary">{t('balance.tradesExecuted')}</span>
-            <span className="font-mono font-semibold text-ink-primary">
+            <span className="neu-text-secondary">{t('balance.tradesExecuted')}</span>
+            <span className="font-mono font-semibold neu-text-primary">
               {tradeCount} / {maxTrades}
             </span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-base-600">
+          <div className="neu-track h-2 overflow-hidden p-px">
             <div
-              className="h-full rounded-full bg-gradient-to-l from-gold to-gold-dark transition-all duration-500"
-              style={{ width: `${progress}%` }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${progress}%`,
+                background: 'var(--neu-gold)',
+              }}
             />
           </div>
         </div>

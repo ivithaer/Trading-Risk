@@ -2,6 +2,197 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Neumorphism Design System ===== */
+:root {
+  /* Light mode (default) */
+  --neu-bg: #e6ebf2;
+  --neu-bg-rgb: 230, 235, 242;
+  --neu-text-primary: #2d3748;
+  --neu-text-secondary: #5a6a7e;
+  --neu-text-muted: #8a98aa;
+  --neu-shadow-dark: rgba(163, 177, 198, 0.55);
+  --neu-shadow-light: rgba(255, 255, 255, 0.85);
+  --neu-shadow-dark-strong: rgba(163, 177, 198, 0.75);
+  --neu-shadow-light-strong: rgba(255, 255, 255, 0.95);
+  --neu-accent: #6b8afe;
+  --neu-accent-soft: rgba(107, 138, 254, 0.15);
+  --neu-profit: #3dab7a;
+  --neu-profit-soft: rgba(61, 171, 122, 0.12);
+  --neu-loss: #d65a6a;
+  --neu-loss-soft: rgba(214, 90, 106, 0.12);
+  --neu-gold: #c9a227;
+  --neu-gold-soft: rgba(201, 162, 39, 0.15);
+}
+
+[data-neu-theme="dark"] {
+  --neu-bg: #1e2433;
+  --neu-bg-rgb: 30, 36, 51;
+  --neu-text-primary: #dde3ef;
+  --neu-text-secondary: #9ba8bd;
+  --neu-text-muted: #6a7588;
+  --neu-shadow-dark: rgba(0, 0, 0, 0.45);
+  --neu-shadow-light: rgba(255, 255, 255, 0.04);
+  --neu-shadow-dark-strong: rgba(0, 0, 0, 0.6);
+  --neu-shadow-light-strong: rgba(255, 255, 255, 0.06);
+  --neu-accent: #8ba3ff;
+  --neu-accent-soft: rgba(139, 163, 255, 0.15);
+  --neu-profit: #4ecf9a;
+  --neu-profit-soft: rgba(78, 207, 154, 0.12);
+  --neu-loss: #f06878;
+  --neu-loss-soft: rgba(240, 104, 120, 0.12);
+  --neu-gold: #f0c84a;
+  --neu-gold-soft: rgba(240, 200, 74, 0.15);
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background-color: var(--neu-bg);
+    color: var(--neu-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--neu-shadow-dark);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--neu-text-muted);
+  }
+
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  /* === Neumorphism Card (raised) === */
+  .neu-card {
+    background-color: var(--neu-bg);
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow:
+      8px 8px 16px var(--neu-shadow-dark),
+      -8px -8px 16px var(--neu-shadow-light);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+
+  /* === Neumorphism Card (inset / pressed) === */
+  .neu-card-inset {
+    background-color: var(--neu-bg);
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow:
+      inset 6px 6px 12px var(--neu-shadow-dark),
+      inset -6px -6px 12px var(--neu-shadow-light);
+  }
+
+  /* === Neumorphism Button (raised) === */
+  .neu-btn {
+    background-color: var(--neu-bg);
+    border: none;
+    border-radius: 1rem;
+    box-shadow:
+      5px 5px 10px var(--neu-shadow-dark),
+      -5px -5px 10px var(--neu-shadow-light);
+    transition: box-shadow 0.2s ease, transform 0.15s ease, color 0.2s ease;
+    color: var(--neu-text-primary);
+  }
+  .neu-btn:hover {
+    box-shadow:
+      6px 6px 12px var(--neu-shadow-dark-strong),
+      -6px -6px 12px var(--neu-shadow-light-strong);
+  }
+  .neu-btn:active,
+  .neu-btn.neu-pressed {
+    box-shadow:
+      inset 3px 3px 6px var(--neu-shadow-dark),
+      inset -3px -3px 6px var(--neu-shadow-light);
+    transform: scale(0.98);
+  }
+
+  /* === Neumorphism Input (inset) === */
+  .neu-input {
+    background-color: var(--neu-bg);
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow:
+      inset 3px 3px 6px var(--neu-shadow-dark),
+      inset -3px -3px 6px var(--neu-shadow-light);
+    color: var(--neu-text-primary);
+    outline: none;
+    transition: box-shadow 0.2s ease;
+  }
+  .neu-input:focus {
+    box-shadow:
+      inset 4px 4px 8px var(--neu-shadow-dark-strong),
+      inset -4px -4px 8px var(--neu-shadow-light-strong);
+  }
+
+  /* === Neumorphism Small Pill (inset well) === */
+  .neu-pill {
+    background-color: var(--neu-bg);
+    border: none;
+    border-radius: 9999px;
+    box-shadow:
+      inset 2px 2px 5px var(--neu-shadow-dark),
+      inset -2px -2px 5px var(--neu-shadow-light);
+  }
+
+  /* === Neumorphism Progress Track === */
+  .neu-track {
+    background-color: var(--neu-bg);
+    border: none;
+    border-radius: 9999px;
+    box-shadow:
+      inset 2px 2px 4px var(--neu-shadow-dark),
+      inset -2px -2px 4px var(--neu-shadow-light);
+  }
+
+  /* === Neumorphism Icon Container === */
+  .neu-icon-box {
+    background-color: var(--neu-bg);
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow:
+      4px 4px 8px var(--neu-shadow-dark),
+      -4px -4px 8px var(--neu-shadow-light);
+  }
+
+  /* === Text color helpers === */
+  .neu-text-primary { color: var(--neu-text-primary); }
+  .neu-text-secondary { color: var(--neu-text-secondary); }
+  .neu-text-muted { color: var(--neu-text-muted); }
+  .neu-text-accent { color: var(--neu-accent); }
+  .neu-text-profit { color: var(--neu-profit); }
+  .neu-text-loss { color: var(--neu-loss); }
+  .neu-text-gold { color: var(--neu-gold); }
+
+  /* === Soft background tints === */
+  .neu-bg-accent-soft { background-color: var(--neu-accent-soft); }
+  .neu-bg-profit-soft { background-color: var(--neu-profit-soft); }
+  .neu-bg-loss-soft { background-color: var(--neu-loss-soft); }
+  .neu-bg-gold-soft { background-color: var(--neu-gold-soft); }
+}
+
 @layer utilities {
   @keyframes pulse-ring {
     0% { box-shadow: 0 0 0 0 rgba(240, 185, 11, 0.4); }
@@ -27,46 +218,7 @@
   }
 }
 
-@layer base {
-  * {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  body {
-    font-family: 'IBM Plex Sans Arabic', sans-serif;
-    background-color: #0a0d14;
-    color: #eaecef;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #252a3a;
-    border-radius: 3px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #3a4156;
-  }
-
-  /* Remove number input spinners */
-  input[type='number']::-webkit-outer-spin-button,
-  input[type='number']::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  input[type='number'] {
-    -moz-appearance: textfield;
-  }
-}
-
+/* === Legacy component classes (kept for unconverted components) === */
 @layer components {
   .card {
     @apply rounded-2xl border border-base-500/60 bg-base-700/80 backdrop-blur-sm;

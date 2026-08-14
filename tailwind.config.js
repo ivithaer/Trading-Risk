@@ -36,6 +36,10 @@ export default {
           secondary: '#8B92A5',
           muted: '#5C6275',
         },
+        neu: {
+          light: '#e6ebf2',
+          dark: '#1e2433',
+        },
       },
       animation: {
         'flash-green': 'flashGreen 0.6s ease-out',
