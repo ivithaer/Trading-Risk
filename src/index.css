@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(240, 185, 11, 0.4); }
+    70% { box-shadow: 0 0 0 12px rgba(240, 185, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(240, 185, 11, 0); }
+  }
+  .animate-pulse-ring {
+    animation: pulse-ring 2s infinite;
+  }
+  @keyframes count-up {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate-count-up {
+    animation: count-up 0.3s ease-out;
+  }
+  @keyframes float-up {
+    0% { transform: translate(-50%, 0); opacity: 1; }
+    100% { transform: translate(-50%, -40px); opacity: 0; }
+  }
+  .animate-float-up {
+    animation: float-up 1s ease-out forwards;
+  }
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background-color: #0a0d14;
+    color: #eaecef;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #252a3a;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a4156;
+  }
+
+  /* Remove number input spinners */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-base-500/60 bg-base-700/80 backdrop-blur-sm;
+  }
+
+  .input-field {
+    @apply w-full rounded-xl border border-base-500 bg-base-800 px-4 py-2.5 text-ink-primary outline-none transition-colors placeholder:text-ink-muted focus:border-gold/60 focus:bg-base-700;
+  }
+
+  .label-text {
+    @apply mb-1.5 block text-sm font-medium text-ink-secondary;
+  }
+
+  .toggle-btn {
+    @apply flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200;
+  }
+  .toggle-btn-active {
+    @apply border-gold/50 bg-gold/10 text-gold;
+  }
+  .toggle-btn-inactive {
+    @apply border-base-500 bg-base-800 text-ink-secondary hover:border-base-400 hover:text-ink-primary;
+  }
+}
