@@ -2,9 +2,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { Trophy, Trash2, Star, Download, RefreshCw, Info, Lock } from 'lucide-react';
 import type { Stats, Settings, Trade } from '@/types';
 import { WIN_RATES, TRADE_COUNTS } from '@/types';
-import { formatCurrency, formatNumber, downloadPlanCsv } from '@/lib/riskEngine';
+import { formatCurrency, formatNumber, downloadPlanCsv, scorePlanRobust, rankPlans, type RobustnessInput } from '@/lib/riskEngine';
 import { fetchTopPlansGlobal, checkPremium, type SavedPlan } from '@/lib/supabaseClient';
 import { useI18n } from '@/lib/i18n';
+import RobustnessBadge from '@/components/RobustnessBadge';
 
 interface LocalPlan {
   id: string;
@@ -121,14 +122,21 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
   };
 
   const localGroups = WIN_RATES.flatMap((wr) =>
-    TRADE_COUNTS.map((tc) => ({
-      winRate: wr,
-      tradeCount: tc,
-      plans: localPlans
-        .filter((p) => p.winRate === wr && p.tradeCount === tc)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5),
-    })),
+    TRADE_COUNTS.map((tc) => {
+      const groupPlans = localPlans
+        .filter((p) => p.winRate === wr && p.tradeCount === tc);
+      const inputs: RobustnessInput[] = groupPlans.map((p) => ({
+        stats: p.stats,
+        settings: p.settings,
+      }));
+      const ranked = rankPlans(inputs);
+      return {
+        winRate: wr,
+        tradeCount: tc,
+        plans: groupPlans,
+        ranked,
+      };
+    }),
   ).filter((g) => g.plans.length > 0);
 
   const dbGroups = WIN_RATES.flatMap((wr) =>
@@ -142,39 +150,49 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
     })),
   ).filter((g) => g.plans.length > 0);
 
-  const renderPlanRow = (plan: LocalPlan | SavedPlan, i: number, isDb: boolean) => {
+  const renderPlanRow = (plan: LocalPlan | SavedPlan, i: number, isDb: boolean, ranked?: ReturnType<typeof rankPlans>) => {
     const stats = plan.stats;
     const finalBalance = isDb ? (plan as SavedPlan).final_balance : (plan as LocalPlan).finalBalance;
     const name = plan.nickname ?? t('common.untitled');
     const id = (plan as any).id as string;
+    const robustResult = ranked && ranked[i] ? ranked[i].result : null;
+    const isRecommended = ranked && ranked[i] ? ranked[i].isRecommended : false;
+    const recReason = ranked && ranked[i] ? ranked[i].recommendationReason : '';
     return (
-      <div key={id} className="flex items-center gap-2 rounded-lg border border-base-500/40 bg-base-800/40 p-2">
-        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-base-600 text-[10px] font-bold text-ink-secondary">
-          {i + 1}
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-xs font-medium text-ink-primary">{name}</div>
-          <div className="text-[10px] text-ink-muted">
-            {formatCurrency(finalBalance)} · {formatNumber(stats.netPnlPercent, 1)}% · DD: {formatNumber(stats.maxDrawdownPercent, 1)}% · {formatNumber(plan.score, 1)}
+      <div key={id} className="rounded-lg bg-base-800/40 p-2.5">
+        <div className="flex items-center gap-2">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-base-600 text-[10px] font-bold text-ink-secondary">
+            {i + 1}
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-xs font-medium text-ink-primary">{name}</div>
+            <div className="text-[10px] text-ink-muted">
+              {formatCurrency(finalBalance)} · {formatNumber(stats.netPnlPercent, 1)}% · DD: {formatNumber(stats.maxDrawdownPercent, 1)}%
+            </div>
           </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => (isDb ? handleDownloadDb(plan as SavedPlan) : handleDownloadLocal(plan as LocalPlan))}
-          className="shrink-0 text-ink-muted transition-colors hover:text-gold"
-          title={t('plans.download')}
-        >
-          <Download size={13} />
-        </button>
-        {!isDb && (
           <button
             type="button"
-            onClick={() => handleDeleteLocal(id)}
-            className="shrink-0 text-ink-muted transition-colors hover:text-loss"
-            title={t('plans.delete')}
+            onClick={() => (isDb ? handleDownloadDb(plan as SavedPlan) : handleDownloadLocal(plan as LocalPlan))}
+            className="shrink-0 text-ink-muted transition-colors hover:text-gold"
+            title={t('plans.download')}
           >
-            <Trash2 size={13} />
+            <Download size={13} />
           </button>
+          {!isDb && (
+            <button
+              type="button"
+              onClick={() => handleDeleteLocal(id)}
+              className="shrink-0 text-ink-muted transition-colors hover:text-loss"
+              title={t('plans.delete')}
+            >
+              <Trash2 size={13} />
+            </button>
+          )}
+        </div>
+        {robustResult && (
+          <div className="mt-2">
+            <RobustnessBadge result={robustResult} isRecommended={isRecommended} recommendationReason={recReason} />
+          </div>
         )}
       </div>
     );
@@ -212,7 +230,7 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
                   <span className="text-xs text-ink-muted">({group.plans.length} {t('plans.plans')})</span>
                 </div>
                 <div className="space-y-1">
-                  {group.plans.map((plan, i) => renderPlanRow(plan, i, false))}
+                  {group.plans.map((plan, i) => renderPlanRow(plan, i, false, group.ranked))}
                 </div>
               </div>
             ))}

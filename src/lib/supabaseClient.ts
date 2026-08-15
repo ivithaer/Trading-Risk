@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Stats, Settings } from '@/types';
-import { scorePlan } from '@/lib/riskEngine';
+import { scorePlanRobust } from '@/lib/riskEngine';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -26,7 +26,7 @@ export async function savePlan(
   finalBalance: number,
   tradeCount: number,
 ): Promise<SavedPlan | null> {
-  const score = scorePlan(stats, settings);
+  const { totalScore: score } = scorePlanRobust({ stats, settings });
   const { data, error } = await supabase
     .from('risk_plans')
     .insert({

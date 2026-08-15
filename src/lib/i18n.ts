@@ -317,6 +317,18 @@ const en: Dict = {
   'mc.percentiles': 'Final Balance Percentiles',
   'mc.distribution': 'Distribution of Final Balances (green = profit, red = loss)',
   'mc.disclaimer': 'Statistical estimate based on shuffling your session trades — not a guarantee of future performance',
+  'robust.title': 'Robustness Analysis',
+  'robust.score': 'Robustness Score',
+  'robust.performance': 'Performance Score',
+  'robust.confidence': 'Statistical Confidence',
+  'robust.recovery': 'Recovery Factor',
+  'robust.effectiveDD': 'Effective Drawdown (MC 95th)',
+  'robust.lossStreak': 'Max Loss Streak',
+  'robust.recommended': 'Recommended',
+  'robust.reason': 'Why this plan was recommended',
+  'robust.high': 'High',
+  'robust.medium': 'Medium',
+  'robust.low': 'Low',
 };
 
 const ar: Dict = {
@@ -617,6 +629,18 @@ const ar: Dict = {
   'mc.percentiles': 'نسب الرصيد النهائي',
   'mc.distribution': 'توزيع الأرصدة النهائية (أخضر = ربح، أحمر = خسارة)',
   'mc.disclaimer': 'تقدير إحصائي مبني على خلط صفقات الجلسة الحالية — ليس ضماناً للأداء المستقبلي',
+  'robust.title': 'تحليل المتانة',
+  'robust.score': 'نقاط المتانة',
+  'robust.performance': 'نقاط الأداء',
+  'robust.confidence': 'الموثوقية الإحصائية',
+  'robust.recovery': 'معامل التعافي',
+  'robust.effectiveDD': 'التراجع الفعلي (MC 95%)',
+  'robust.lossStreak': 'أطول سلسلة خسائر',
+  'robust.recommended': 'مُرشّحة',
+  'robust.reason': 'سبب الترشيح',
+  'robust.high': 'عالية',
+  'robust.medium': 'متوسطة',
+  'robust.low': 'منخفضة',
 };
 
 const es: Dict = {

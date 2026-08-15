@@ -237,6 +237,174 @@ export function scorePlan(stats: Stats, settings: Settings): number {
   return pnlScore - drawdownPenalty + winRateBonus + rrrBonus;
 }
 
+export interface RobustnessInput {
+  stats: Stats;
+  settings: Settings;
+  mcWorstDrawdownPct?: number;
+  mcMaxLossStreak?: number;
+  numSimulations?: number;
+}
+
+export interface RobustnessResult {
+  totalScore: number;
+  performanceScore: number;
+  robustnessScore: number;
+  confidenceWeight: number;
+  effectiveDrawdown: number;
+  recoveryFactor: number;
+  effectiveMaxLossStreak: number;
+  explanation: string;
+}
+
+export function scorePlanRobust(input: RobustnessInput): RobustnessResult {
+  const { stats, settings } = input;
+
+  const effectiveDrawdown =
+    input.mcWorstDrawdownPct !== undefined && input.mcWorstDrawdownPct > 0
+      ? input.mcWorstDrawdownPct
+      : stats.maxDrawdownPercent;
+
+  const effectiveMaxLossStreak =
+    input.mcMaxLossStreak !== undefined && input.mcMaxLossStreak > 0
+      ? input.mcMaxLossStreak
+      : stats.longestLossStreak;
+
+  const performanceScore = stats.netPnlPercent - effectiveDrawdown;
+
+  const recoveryFactor = effectiveDrawdown > 0 ? stats.netPnlPercent / effectiveDrawdown : 0;
+
+  const winRateRobustness = (100 - settings.winRate) * 0.15;
+  const rrrRobustness = Math.max(0, 5 - settings.rrr) * 3;
+  const riskPct = settings.riskType === 'percentage'
+    ? settings.riskMode === 'fixed' ? settings.fixedRisk : settings.riskLevels[0] ?? 0
+    : 0;
+  const riskRobustness = Math.max(0, 10 - riskPct) * 0.5;
+  const streakPenalty = effectiveMaxLossStreak * 1.5;
+
+  const robustnessScore = winRateRobustness + rrrRobustness + riskRobustness - streakPenalty;
+
+  const tradeCount = stats.totalTrades;
+  const confidenceWeight = tradeCount >= 200 ? 1.0
+    : tradeCount >= 100 ? 0.9
+    : tradeCount >= 50 ? 0.75
+    : tradeCount >= 20 ? 0.55
+    : 0.35;
+
+  const totalScore = (performanceScore + robustnessScore * 0.6 + recoveryFactor * 2) * confidenceWeight;
+
+  const factors: string[] = [];
+  if (input.mcWorstDrawdownPct !== undefined) {
+    factors.push(`التراجع محسوب من ${input.numSimulations ?? 0} محاكاة Monte Carlo (الشريحة 95%)`);
+  }
+  if (settings.winRate < 50) {
+    factors.push(`نسبة نجاح منخفضة (${settings.winRate}%) — أسهل تطبيقاً`);
+  }
+  if (settings.rrr <= 2) {
+    factors.push(`RRR معتدل (${settings.rrr}) — أكثر واقعية`);
+  }
+  if (riskPct > 0 && riskPct <= 3) {
+    factors.push(`مخاطرة منخفضة (${riskPct}%) — أمان أعلى`);
+  }
+  if (effectiveMaxLossStreak <= 5) {
+    factors.push(`سلسلة خسائر قصيرة (${effectiveMaxLossStreak}) — أسهل نفسياً`);
+  }
+  if (tradeCount >= 200) {
+    factors.push(`عينة كبيرة (${tradeCount} صفقة) — موثوقية إحصائية عالية`);
+  } else if (tradeCount < 50) {
+    factors.push(`عينة صغيرة (${tradeCount} صفقة) — موثوقية منخفضة`);
+  }
+  if (recoveryFactor > 3) {
+    factors.push(`معامل تعافي قوي (${recoveryFactor.toFixed(1)})`);
+  }
+
+  const explanation = factors.length > 0
+    ? factors.join(' · ')
+    : 'أداء متوازن بدون ميزات متفردة';
+
+  return {
+    totalScore,
+    performanceScore,
+    robustnessScore,
+    confidenceWeight,
+    effectiveDrawdown,
+    recoveryFactor,
+    effectiveMaxLossStreak,
+    explanation,
+  };
+}
+
+export interface RankedPlan {
+  plan: RobustnessInput;
+  result: RobustnessResult;
+  rank: number;
+  isRecommended: boolean;
+  recommendationReason: string;
+}
+
+export function rankPlans(inputs: RobustnessInput[]): RankedPlan[] {
+  const ranked = inputs.map((plan) => ({
+    plan,
+    result: scorePlanRobust(plan),
+  }));
+
+  ranked.sort((a, b) => {
+    const perfDiff = Math.abs(a.result.performanceScore - b.result.performanceScore);
+    if (perfDiff <= 5) {
+      return b.result.robustnessScore - a.result.robustnessScore;
+    }
+    return b.result.totalScore - a.result.totalScore;
+  });
+
+  return ranked.map((item, i) => {
+    let reason = '';
+    let isRecommended = false;
+
+    if (i === 0 && ranked.length > 1) {
+      const second = ranked[1];
+      const perfDiff = Math.abs(item.result.performanceScore - second.result.performanceScore);
+      isRecommended = true;
+
+      if (perfDiff <= 5 && item.result.robustnessScore > second.result.robustnessScore) {
+        const reasons: string[] = [];
+        if (item.plan.settings.winRate < second.plan.settings.winRate) {
+          reasons.push(`نسبة نجاح أقل بـ ${(second.plan.settings.winRate - item.plan.settings.winRate).toFixed(0)}%`);
+        }
+        if (item.plan.settings.rrr < second.plan.settings.rrr) {
+          reasons.push(`RRR أقل بـ ${(second.plan.settings.rrr - item.plan.settings.rrr).toFixed(1)}`);
+        }
+        const itemRisk = item.plan.settings.riskType === 'percentage'
+          ? item.plan.settings.riskMode === 'fixed' ? item.plan.settings.fixedRisk : item.plan.settings.riskLevels[0] ?? 0
+          : 0;
+        const secondRisk = second.plan.settings.riskType === 'percentage'
+          ? second.plan.settings.riskMode === 'fixed' ? second.plan.settings.fixedRisk : second.plan.settings.riskLevels[0] ?? 0
+          : 0;
+        if (itemRisk < secondRisk) {
+          reasons.push(`مخاطرة أقل بـ ${(secondRisk - itemRisk).toFixed(1)}%`);
+        }
+        if (item.result.effectiveMaxLossStreak < second.result.effectiveMaxLossStreak) {
+          reasons.push(`سلسلة خسائر أقصر بـ ${second.result.effectiveMaxLossStreak - item.result.effectiveMaxLossStreak}`);
+        }
+        reason = reasons.length > 0
+          ? `رُشحت رغم عائد ${item.result.performanceScore < second.result.performanceScore ? 'أقل قليلاً' : 'مقارب'} لأن ${reasons.join('، ')}، مما يجعلها أكثر واقعية للتطبيق الفعلي`
+          : 'رُشحت كأفضل خطة بأعلى نقاط متانة ضمن أداء متقارب';
+      } else {
+        reason = 'رُشحت كأعلى أداء ضمن المجموعة';
+      }
+    } else if (i === 0) {
+      isRecommended = true;
+      reason = 'رُشحت كأفضل خطة في المجموعة';
+    }
+
+    return {
+      plan: item.plan,
+      result: item.result,
+      rank: i + 1,
+      isRecommended,
+      recommendationReason: reason,
+    };
+  });
+}
+
 export function formatCurrency(value: number): string {
   const sign = value < 0 ? '-' : '';
   const abs = Math.abs(value);
