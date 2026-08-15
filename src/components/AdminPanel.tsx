@@ -109,37 +109,37 @@ export default function AdminPanel() {
 
   if (!authed) {
     return (
-      <div className="card p-5">
+      <div className="neu-card p-5">
         <div className="mb-4 flex items-center gap-2">
-          <Shield size={18} className="text-gold" />
-          <h2 className="text-base font-semibold text-ink-primary">{t('admin.title')}</h2>
+          <Shield size={18} className="neu-text-gold" />
+          <h2 className="text-base font-semibold neu-text-primary">{t('admin.title')}</h2>
         </div>
         <form onSubmit={handleLogin} className="space-y-3">
-          <p className="text-xs text-ink-secondary">{t('admin.desc')}</p>
+          <p className="text-xs neu-text-secondary">{t('admin.desc')}</p>
           <div>
-            <label className="label-text">{t('admin.password')}</label>
+            <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('admin.password')}</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-field pl-10"
+                className="neu-input w-full px-4 py-2.5 pl-10"
                 placeholder="••••••••"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink-primary"
+                className="absolute left-3 top-1/2 -translate-y-1/2 neu-text-muted hover:neu-text-primary"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
-          {error && <p className="text-xs text-loss-light">{error}</p>}
+          {error && <p className="text-xs neu-text-loss">{error}</p>}
           <button
             type="submit"
             disabled={authenticating}
-            className="w-full rounded-xl bg-gold py-2.5 text-sm font-bold text-base-900 transition-colors hover:bg-gold-light disabled:opacity-50"
+            className="neu-btn w-full py-2.5 text-sm font-bold neu-text-gold transition-colors disabled:opacity-50"
           >
             {authenticating ? t('admin.checking') : t('admin.login')}
           </button>
@@ -149,18 +149,19 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="card p-5">
+    <div className="neu-card p-5">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Shield size={18} className="text-gold" />
-          <h2 className="text-base font-semibold text-ink-primary">{t('admin.title')}</h2>
+          <Shield size={18} className="neu-text-gold" />
+          <h2 className="text-base font-semibold neu-text-primary">{t('admin.title')}</h2>
         </div>
         <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={loadPlans}
             disabled={loading}
-            className="flex items-center gap-1 rounded-lg border border-base-500 px-2 py-1 text-xs text-ink-secondary transition-colors hover:text-ink-primary"
+            className="flex items-center gap-1 neu-btn px-2 py-1 text-xs neu-text-secondary transition-colors hover:neu-text-primary"
+            style={{ borderRadius: '0.5rem' }}
           >
             <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -168,7 +169,8 @@ export default function AdminPanel() {
             type="button"
             onClick={downloadAllCsv}
             disabled={plans.length === 0}
-            className="flex items-center gap-1 rounded-lg border border-base-500 px-2 py-1 text-xs text-ink-secondary transition-colors hover:border-gold/50 hover:text-gold disabled:opacity-50"
+            className="flex items-center gap-1 neu-btn px-2 py-1 text-xs neu-text-secondary transition-colors hover:neu-text-gold disabled:opacity-50"
+            style={{ borderRadius: '0.5rem' }}
           >
             <Download size={12} />
             {t('admin.downloadAll')}
@@ -179,17 +181,18 @@ export default function AdminPanel() {
               sessionStorage.removeItem(ADMIN_AUTH_KEY);
               setAuthed(false);
             }}
-            className="flex items-center gap-1 rounded-lg border border-base-500 px-2 py-1 text-xs text-ink-secondary transition-colors hover:text-loss"
+            className="flex items-center gap-1 neu-btn px-2 py-1 text-xs neu-text-secondary transition-colors hover:neu-text-loss"
+            style={{ borderRadius: '0.5rem' }}
           >
             <Lock size={12} />
           </button>
         </div>
       </div>
 
-      <div className="mb-3 text-sm text-ink-secondary">{t('admin.best20')}</div>
+      <div className="mb-3 text-sm neu-text-secondary">{t('admin.best20')}</div>
 
       {grouped.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-base-500 py-4 text-center text-xs text-ink-muted">
+        <p className="neu-card-inset py-4 text-center text-xs neu-text-muted" style={{ borderRadius: '0.75rem' }}>
           {t('admin.noPlans')}
         </p>
       ) : (
@@ -197,32 +200,33 @@ export default function AdminPanel() {
           {grouped.map((group) => (
             <div key={`${group.winRate}-${group.tradeCount}`}>
               <div className="mb-1.5 flex items-center gap-2">
-                <span className="rounded-md bg-gold/15 px-2 py-0.5 text-xs font-bold text-gold">
+                <span className="neu-pill px-2 py-0.5 text-xs font-bold neu-text-gold">
                   {group.winRate}% · {group.tradeCount} {t('plans.trades')}
                 </span>
-                <span className="text-xs text-ink-muted">({group.plans.length} {t('plans.plans')})</span>
+                <span className="text-xs neu-text-muted">({group.plans.length} {t('plans.plans')})</span>
               </div>
               <div className="space-y-1">
                 {group.plans.map((plan, i) => (
                   <div
                     key={plan.id}
-                    className="flex items-center gap-2 rounded-lg border border-base-500/40 bg-base-800/40 p-2"
+                    className="flex items-center gap-2 neu-card-inset p-2"
+                    style={{ borderRadius: '0.75rem' }}
                   >
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-base-600 text-[10px] font-bold text-ink-secondary">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center neu-pill text-[10px] font-bold neu-text-secondary">
                       {i + 1}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs font-medium text-ink-primary">
+                      <div className="truncate text-xs font-medium neu-text-primary">
                         {plan.nickname ?? t('common.untitled')}
                       </div>
-                      <div className="text-[10px] text-ink-muted">
+                      <div className="text-[10px] neu-text-muted">
                         {formatCurrency(plan.final_balance)} · {formatNumber(plan.stats.netPnlPercent, 1)}% · DD: {formatNumber(plan.stats.maxDrawdownPercent, 1)}% · {formatNumber(plan.score, 1)}
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => downloadPlanCsv(plan, `admin_${plan.nickname ?? plan.id}.csv`)}
-                      className="shrink-0 text-ink-muted transition-colors hover:text-gold"
+                      className="shrink-0 neu-text-muted transition-colors hover:neu-text-gold"
                       title={t('admin.downloadPlan')}
                     >
                       <Download size={13} />

@@ -62,7 +62,6 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
     loadDbPlans();
   }, [loadDbPlans]);
 
-  // Listen for new plans saved by the 5× test button (via custom event)
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail as LocalPlan;
@@ -91,7 +90,6 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
   const handleDeleteLocal = (id: string) => {
     persistLocal(localPlans.filter((p) => p.id !== id));
   };
-
 
   const handleDownloadLocal = (plan: LocalPlan) => {
     downloadPlanCsv({
@@ -159,21 +157,21 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
     const isRecommended = ranked && ranked[i] ? ranked[i].isRecommended : false;
     const recReason = ranked && ranked[i] ? ranked[i].recommendationReason : '';
     return (
-      <div key={id} className="rounded-lg bg-base-800/40 p-2.5">
+      <div key={id} className="neu-card-inset p-2.5" style={{ borderRadius: '0.75rem' }}>
         <div className="flex items-center gap-2">
-          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-base-600 text-[10px] font-bold text-ink-secondary">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center neu-pill text-[10px] font-bold neu-text-secondary">
             {i + 1}
           </span>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-xs font-medium text-ink-primary">{name}</div>
-            <div className="text-[10px] text-ink-muted">
+            <div className="truncate text-xs font-medium neu-text-primary">{name}</div>
+            <div className="text-[10px] neu-text-muted">
               {formatCurrency(finalBalance)} · {formatNumber(stats.netPnlPercent, 1)}% · DD: {formatNumber(stats.maxDrawdownPercent, 1)}%
             </div>
           </div>
           <button
             type="button"
             onClick={() => (isDb ? handleDownloadDb(plan as SavedPlan) : handleDownloadLocal(plan as LocalPlan))}
-            className="shrink-0 text-ink-muted transition-colors hover:text-gold"
+            className="shrink-0 neu-text-muted transition-colors hover:neu-text-gold"
             title={t('plans.download')}
           >
             <Download size={13} />
@@ -182,7 +180,7 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
             <button
               type="button"
               onClick={() => handleDeleteLocal(id)}
-              className="shrink-0 text-ink-muted transition-colors hover:text-loss"
+              className="shrink-0 neu-text-muted transition-colors hover:neu-text-loss"
               title={t('plans.delete')}
             >
               <Trash2 size={13} />
@@ -199,24 +197,24 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
   };
 
   return (
-    <div className="card p-5">
+    <div className="neu-card p-5">
       <div className="mb-3 flex items-center gap-2">
-        <Trophy size={18} className="text-gold" />
-        <h2 className="text-base font-semibold text-ink-primary">{t('plans.title')}</h2>
+        <Trophy size={18} className="neu-text-gold" />
+        <h2 className="text-base font-semibold neu-text-primary">{t('plans.title')}</h2>
       </div>
 
-      <div className="mb-3 flex items-start gap-1.5 rounded-xl border border-base-500/40 bg-base-800/40 px-3 py-2 text-[11px] leading-relaxed text-ink-muted">
-        <Info size={13} className="mt-0.5 shrink-0 text-gold/70" />
+      <div className="mb-3 flex items-start gap-1.5 neu-card-inset px-3 py-2 text-[11px] leading-relaxed neu-text-muted" style={{ borderRadius: '0.75rem' }}>
+        <Info size={13} className="mt-0.5 shrink-0 neu-text-gold" />
         <span>{t('plans.info')}</span>
       </div>
 
       <div className="mb-4">
-        <div className="mb-2 flex items-center gap-1.5 text-sm font-medium text-ink-secondary">
-          <Star size={14} className="text-gold" />
+        <div className="mb-2 flex items-center gap-1.5 text-sm font-medium neu-text-secondary">
+          <Star size={14} className="neu-text-gold" />
           {t('plans.best5')}
         </div>
         {localGroups.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-base-500 py-4 text-center text-xs text-ink-muted">
+          <p className="neu-card-inset py-4 text-center text-xs neu-text-muted" style={{ borderRadius: '0.75rem' }}>
             {t('plans.noPlans')}
           </p>
         ) : (
@@ -224,10 +222,10 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
             {localGroups.map((group) => (
               <div key={`${group.winRate}-${group.tradeCount}`}>
                 <div className="mb-1.5 flex items-center gap-2">
-                  <span className="rounded-md bg-gold/15 px-2 py-0.5 text-xs font-bold text-gold">
+                  <span className="neu-pill px-2 py-0.5 text-xs font-bold neu-text-gold">
                     {group.winRate}% · {group.tradeCount} {t('plans.trades')}
                   </span>
-                  <span className="text-xs text-ink-muted">({group.plans.length} {t('plans.plans')})</span>
+                  <span className="text-xs neu-text-muted">({group.plans.length} {t('plans.plans')})</span>
                 </div>
                 <div className="space-y-1">
                   {group.plans.map((plan, i) => renderPlanRow(plan, i, false, group.ranked))}
@@ -240,50 +238,50 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
 
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-sm font-medium text-ink-secondary">
-            <Download size={14} className="text-gold" />
+          <div className="flex items-center gap-1.5 text-sm font-medium neu-text-secondary">
+            <Download size={14} className="neu-text-gold" />
             {t('plans.best20')}
           </div>
           <button
             type="button"
             onClick={loadDbPlans}
             disabled={loadingDb}
-            className="text-ink-muted transition-colors hover:text-ink-primary"
+            className="neu-text-muted transition-colors hover:neu-text-primary"
           >
             <RefreshCw size={14} className={loadingDb ? 'animate-spin' : ''} />
           </button>
         </div>
 
         {!isPremium ? (
-          <div className="rounded-xl border border-base-500/50 bg-base-800/60 p-4">
-            <div className="mb-3 flex items-center gap-1.5 text-sm font-medium text-ink-primary">
-              <Lock size={14} className="text-gold" />
+          <div className="neu-card-inset p-4" style={{ borderRadius: '1rem' }}>
+            <div className="mb-3 flex items-center gap-1.5 text-sm font-medium neu-text-primary">
+              <Lock size={14} className="neu-text-gold" />
               {t('plans.locked')}
             </div>
-            <p className="mb-3 text-xs text-ink-secondary">{t('plans.lockedDesc')}</p>
+            <p className="mb-3 text-xs neu-text-secondary">{t('plans.lockedDesc')}</p>
             <form onSubmit={handlePremiumCheck} className="space-y-2">
               <input
                 type="email"
                 value={premiumEmail}
                 onChange={(e) => setPremiumEmail(e.target.value)}
                 placeholder={t('plans.emailPlaceholder')}
-                className="input-field text-sm"
+                className="neu-input w-full px-4 py-2.5 text-sm"
               />
               <button
                 type="submit"
                 disabled={premiumChecking}
-                className="w-full rounded-xl bg-gold py-2 text-sm font-bold text-base-900 transition-colors hover:bg-gold-light disabled:opacity-50"
+                className="neu-btn w-full py-2.5 text-sm font-bold neu-text-gold transition-colors disabled:opacity-50"
               >
                 {premiumChecking ? t('plans.checking') : t('plans.checkPremium')}
               </button>
             </form>
-            {premiumError && <p className="mt-2 text-xs text-loss-light">{premiumError}</p>}
-            <p className="mt-3 text-center text-[10px] text-ink-muted">{t('plans.subscribeNote')}</p>
+            {premiumError && <p className="mt-2 text-xs neu-text-loss">{premiumError}</p>}
+            <p className="mt-3 text-center text-[10px] neu-text-muted">{t('plans.subscribeNote')}</p>
           </div>
         ) : (
           <div className="space-y-3">
             {dbGroups.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-base-500 py-4 text-center text-xs text-ink-muted">
+              <p className="neu-card-inset py-4 text-center text-xs neu-text-muted" style={{ borderRadius: '0.75rem' }}>
                 {t('admin.noPlans')}
               </p>
             ) : (
@@ -291,10 +289,10 @@ export default function SavedPlansPanel({ trades, settings, balance, isComplete,
                 {dbGroups.map((group) => (
                   <div key={`${group.winRate}-${group.tradeCount}`}>
                     <div className="mb-1.5 flex items-center gap-2">
-                      <span className="rounded-md bg-gold/15 px-2 py-0.5 text-xs font-bold text-gold">
+                      <span className="neu-pill px-2 py-0.5 text-xs font-bold neu-text-gold">
                         {group.winRate}% · {group.tradeCount} {t('plans.trades')}
                       </span>
-                      <span className="text-xs text-ink-muted">({group.plans.length} {t('plans.plans')})</span>
+                      <span className="text-xs neu-text-muted">({group.plans.length} {t('plans.plans')})</span>
                     </div>
                     <div className="space-y-1">
                       {group.plans.map((plan, i) => renderPlanRow(plan, i, true))}

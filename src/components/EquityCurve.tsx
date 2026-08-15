@@ -12,9 +12,9 @@ export default function EquityCurve({ trades, startingBalance }: Props) {
 
   if (trades.length === 0) {
     return (
-      <div className="card flex flex-col items-center justify-center p-8 text-center">
-        <LineChart size={32} className="mb-2 text-ink-muted" />
-        <p className="text-sm text-ink-secondary">{t('equity.empty')}</p>
+      <div className="neu-card flex flex-col items-center justify-center p-8 text-center">
+        <LineChart size={32} className="mb-2 neu-text-muted" />
+        <p className="text-sm neu-text-secondary">{t('equity.empty')}</p>
       </div>
     );
   }
@@ -39,13 +39,13 @@ export default function EquityCurve({ trades, startingBalance }: Props) {
 
   const areaD = `${pathD} L ${points[points.length - 1].x.toFixed(2)} ${height - padding} L ${points[0].x.toFixed(2)} ${height - padding} Z`;
   const isUp = trades[trades.length - 1].balanceAfter >= startingBalance;
-  const lineColor = isUp ? '#16C784' : '#EA3943';
+  const lineColor = isUp ? 'var(--neu-profit)' : 'var(--neu-loss)';
 
   return (
-    <div className="card p-5">
+    <div className="neu-card p-5">
       <div className="mb-3 flex items-center gap-2">
-        <LineChart size={18} className="text-gold" />
-        <h2 className="text-base font-semibold text-ink-primary">{t('equity.title')}</h2>
+        <LineChart size={18} className="neu-text-gold" />
+        <h2 className="text-base font-semibold neu-text-primary">{t('equity.title')}</h2>
       </div>
       <div className="relative">
         <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-40 w-full">
@@ -64,7 +64,7 @@ export default function EquityCurve({ trades, startingBalance }: Props) {
                 y1={startY}
                 x2={width - padding}
                 y2={startY}
-                stroke="#3A4156"
+                stroke="var(--neu-shadow-dark)"
                 strokeWidth="0.4"
                 strokeDasharray="2 2"
               />
@@ -80,7 +80,7 @@ export default function EquityCurve({ trades, startingBalance }: Props) {
           />
         </svg>
       </div>
-      <div className="mt-2 flex justify-between text-xs text-ink-muted">
+      <div className="mt-2 flex justify-between text-xs neu-text-muted">
         <span>{t('equity.start')}: ${startingBalance.toLocaleString('en-US')}</span>
         <span>{t('equity.high')}: ${Math.round(maxBal).toLocaleString('en-US')}</span>
         <span>{t('equity.low')}: ${Math.round(minBal).toLocaleString('en-US')}</span>

@@ -24,7 +24,10 @@ function ToggleGroup<T extends string>({
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
-          className={`toggle-btn ${value === opt.value ? 'toggle-btn-active' : 'toggle-btn-inactive'}`}
+          className={`flex-1 px-3 py-2 text-sm font-medium transition-all duration-200 neu-btn ${
+            value === opt.value ? 'neu-pressed neu-text-gold' : 'neu-text-secondary'
+          }`}
+          style={{ borderRadius: '0.75rem' }}
         >
           {opt.label}
         </button>
@@ -58,14 +61,14 @@ function RiskLevelEditor({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1.5 text-xs text-ink-secondary">
-        <Info size={13} className="text-gold/70" />
+      <div className="flex items-center gap-1.5 text-xs neu-text-secondary">
+        <Info size={13} className="neu-text-gold" />
         <span>{t('settings.levelInfo')}</span>
       </div>
       <div className="space-y-2">
         {levels.map((level, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-base-600 text-xs font-semibold text-ink-secondary">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center neu-icon-box text-xs font-semibold neu-text-secondary" style={{ borderRadius: '0.5rem' }}>
               {i + 1}
             </span>
             <div className="relative flex-1">
@@ -73,9 +76,9 @@ function RiskLevelEditor({
                 type="number"
                 value={level}
                 onChange={(e) => update(i, parseFloat(e.target.value))}
-                className="input-field px-3 py-1.5 pl-10 text-left font-mono"
+                className="neu-input w-full px-3 py-1.5 pl-10 text-left font-mono"
               />
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink-muted">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm neu-text-muted">
                 $ / %
               </span>
             </div>
@@ -83,7 +86,8 @@ function RiskLevelEditor({
               <button
                 type="button"
                 onClick={() => remove(i)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-base-500 text-ink-secondary transition-colors hover:border-loss/50 hover:text-loss"
+                className="flex h-8 w-8 shrink-0 items-center justify-center neu-btn neu-text-secondary transition-colors hover:neu-text-loss"
+                style={{ borderRadius: '0.5rem' }}
               >
                 <Minus size={15} />
               </button>
@@ -95,7 +99,8 @@ function RiskLevelEditor({
         type="button"
         onClick={add}
         disabled={levels.length >= 10}
-        className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-base-400 py-2 text-sm text-ink-secondary transition-colors hover:border-gold/50 hover:text-gold disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex w-full items-center justify-center gap-1.5 neu-btn py-2 text-sm neu-text-secondary transition-colors hover:neu-text-gold disabled:cursor-not-allowed disabled:opacity-40"
+        style={{ borderRadius: '0.75rem' }}
       >
         <Plus size={15} /> {levels.length >= 10 ? t('settings.maxLevels') : t('settings.addLevel')}
       </button>
@@ -108,72 +113,72 @@ export default function SettingsPanel({ settings, onChange }: Props) {
   const update = (patch: Partial<Settings>) => onChange({ ...settings, ...patch });
 
   return (
-    <div className="card p-5">
+    <div className="neu-card p-5">
       <div className="mb-4 flex items-center gap-2">
-        <Settings2 size={18} className="text-gold" />
-        <h2 className="text-base font-semibold text-ink-primary">{t('settings.title')}</h2>
+        <Settings2 size={18} className="neu-text-gold" />
+        <h2 className="text-base font-semibold neu-text-primary">{t('settings.title')}</h2>
       </div>
 
       <div className="space-y-4">
         <div>
-          <label className="label-text">{t('settings.startingBalance')}</label>
+          <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('settings.startingBalance')}</label>
           <input
             type="number"
             value={settings.startingBalance}
             onChange={(e) => update({ startingBalance: parseFloat(e.target.value) || 0 })}
-            className="input-field font-mono"
+            className="neu-input w-full px-4 py-2.5 font-mono"
           />
         </div>
 
         <div>
-          <label className="label-text">{t('settings.winRate')}</label>
+          <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('settings.winRate')}</label>
           <div className="relative">
             <select
               value={settings.winRate}
               onChange={(e) => update({ winRate: parseFloat(e.target.value) })}
-              className="input-field appearance-none pl-9 font-mono"
+              className="neu-input w-full appearance-none px-4 py-2.5 pl-9 font-mono"
             >
               {WIN_RATES.map((wr) => (
                 <option key={wr} value={wr}>{wr}%</option>
               ))}
             </select>
-            <ChevronDown size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted" />
+            <ChevronDown size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 neu-text-muted" />
           </div>
         </div>
 
         <div>
-          <label className="label-text">{t('settings.rrr')}</label>
+          <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('settings.rrr')}</label>
           <div className="relative">
             <input
               type="number"
               value={settings.rrr}
               onChange={(e) => update({ rrr: parseFloat(e.target.value) || 0 })}
-              className="input-field pl-16 font-mono"
+              className="neu-input w-full px-4 py-2.5 pl-16 font-mono"
               step={0.1}
               min={0}
             />
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink-muted">: 1</span>
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm neu-text-muted">: 1</span>
           </div>
         </div>
 
         <div>
-          <label className="label-text">{t('settings.maxTrades')}</label>
+          <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('settings.maxTrades')}</label>
           <div className="relative">
             <select
               value={settings.maxTrades}
               onChange={(e) => update({ maxTrades: parseInt(e.target.value, 10) })}
-              className="input-field appearance-none pl-9 font-mono"
+              className="neu-input w-full appearance-none px-4 py-2.5 pl-9 font-mono"
             >
               {TRADE_COUNTS.map((tc) => (
                 <option key={tc} value={tc}>{tc} {t('settings.trades')}</option>
               ))}
             </select>
-            <ChevronDown size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted" />
+            <ChevronDown size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 neu-text-muted" />
           </div>
         </div>
 
         <div>
-          <label className="label-text">{t('settings.riskMode')}</label>
+          <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('settings.riskMode')}</label>
           <ToggleGroup<RiskMode>
             options={[
               { value: 'variable', label: t('settings.variable') },
@@ -185,7 +190,7 @@ export default function SettingsPanel({ settings, onChange }: Props) {
         </div>
 
         <div>
-          <label className="label-text">{t('settings.riskType')}</label>
+          <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('settings.riskType')}</label>
           <ToggleGroup<RiskType>
             options={[
               { value: 'dollar', label: t('settings.dollar') },
@@ -198,7 +203,7 @@ export default function SettingsPanel({ settings, onChange }: Props) {
 
         {settings.riskMode === 'variable' ? (
           <div>
-            <label className="label-text">{t('settings.riskLevels')}</label>
+            <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('settings.riskLevels')}</label>
             <RiskLevelEditor
               levels={settings.riskLevels}
               onChange={(levels) => update({ riskLevels: levels })}
@@ -206,14 +211,14 @@ export default function SettingsPanel({ settings, onChange }: Props) {
           </div>
         ) : (
           <div>
-            <label className="label-text">
+            <label className="mb-1.5 block text-sm font-medium neu-text-secondary">
               {t('settings.fixedRisk')} {settings.riskType === 'percentage' ? '(%)' : '($)'}
             </label>
             <input
               type="number"
               value={settings.fixedRisk}
               onChange={(e) => update({ fixedRisk: parseFloat(e.target.value) || 0 })}
-              className="input-field font-mono"
+              className="neu-input w-full px-4 py-2.5 font-mono"
               min={0}
             />
           </div>

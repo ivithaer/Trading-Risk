@@ -22,7 +22,7 @@ function StatCard({
   icon,
   label,
   value,
-  valueClass = 'text-ink-primary',
+  valueClass = 'neu-text-primary',
   sub,
 }: {
   icon: React.ReactNode;
@@ -32,13 +32,13 @@ function StatCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-base-500/50 bg-base-800/60 p-3">
-      <div className="mb-1.5 flex items-center gap-1.5 text-ink-muted">
+    <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+      <div className="mb-1.5 flex items-center gap-1.5 neu-text-muted">
         {icon}
         <span className="text-xs">{label}</span>
       </div>
       <div className={`font-mono text-lg font-semibold ${valueClass}`}>{value}</div>
-      {sub && <div className="text-xs text-ink-muted">{sub}</div>}
+      {sub && <div className="text-xs neu-text-muted">{sub}</div>}
     </div>
   );
 }
@@ -48,9 +48,9 @@ export default function StatsPanel({ stats, hasTrades }: Props) {
 
   if (!hasTrades) {
     return (
-      <div className="card flex flex-col items-center justify-center p-8 text-center">
-        <BarChart3 size={32} className="mb-2 text-ink-muted" />
-        <p className="text-sm text-ink-secondary">{t('stats.startTrading')}</p>
+      <div className="neu-card flex flex-col items-center justify-center p-8 text-center">
+        <BarChart3 size={32} className="mb-2 neu-text-muted" />
+        <p className="text-sm neu-text-secondary">{t('stats.startTrading')}</p>
       </div>
     );
   }
@@ -59,10 +59,10 @@ export default function StatsPanel({ stats, hasTrades }: Props) {
     stats.profitFactor === Infinity ? '∞' : formatNumber(stats.profitFactor, 2);
 
   return (
-    <div className="card p-5">
+    <div className="neu-card p-5">
       <div className="mb-4 flex items-center gap-2">
-        <BarChart3 size={18} className="text-gold" />
-        <h2 className="text-base font-semibold text-ink-primary">{t('stats.title')}</h2>
+        <BarChart3 size={18} className="neu-text-gold" />
+        <h2 className="text-base font-semibold neu-text-primary">{t('stats.title')}</h2>
       </div>
       <div className="grid grid-cols-2 gap-2.5">
         <StatCard
@@ -75,53 +75,53 @@ export default function StatsPanel({ stats, hasTrades }: Props) {
           icon={<Activity size={13} />}
           label={t('stats.netPnl')}
           value={formatCurrency(stats.netPnl)}
-          valueClass={stats.netPnl >= 0 ? 'text-profit' : 'text-loss-light'}
+          valueClass={stats.netPnl >= 0 ? 'neu-text-profit' : 'neu-text-loss'}
           sub={formatPercent(stats.netPnlPercent)}
         />
         <StatCard
           icon={<TrendingDown size={13} />}
           label={t('stats.maxDrawdown')}
           value={formatCurrency(stats.maxDrawdown)}
-          valueClass="text-loss-light"
+          valueClass="neu-text-loss"
           sub={`${formatNumber(stats.maxDrawdownPercent, 1)}%`}
         />
         <StatCard
           icon={<Scale size={13} />}
           label={t('stats.profitFactor')}
           value={profitFactorText}
-          valueClass={stats.profitFactor >= 1 ? 'text-profit' : 'text-loss-light'}
+          valueClass={stats.profitFactor >= 1 ? 'neu-text-profit' : 'neu-text-loss'}
         />
         <StatCard
           icon={<ArrowUpCircle size={13} />}
           label={t('stats.largestWin')}
           value={formatCurrency(stats.largestWin)}
-          valueClass="text-profit"
+          valueClass="neu-text-profit"
         />
         <StatCard
           icon={<ArrowDownCircle size={13} />}
           label={t('stats.largestLoss')}
           value={formatCurrency(stats.largestLoss)}
-          valueClass="text-loss-light"
+          valueClass="neu-text-loss"
         />
         <StatCard
           icon={<Flame size={13} />}
           label={t('stats.longestWinStreak')}
           value={`${stats.longestWinStreak}`}
-          valueClass="text-profit"
+          valueClass="neu-text-profit"
           sub={t('stats.consecutiveTrades')}
         />
         <StatCard
           icon={<Flame size={13} />}
           label={t('stats.longestLossStreak')}
           value={`${stats.longestLossStreak}`}
-          valueClass="text-loss-light"
+          valueClass="neu-text-loss"
           sub={t('stats.consecutiveTrades')}
         />
         <StatCard
           icon={<Percent size={13} />}
           label={t('stats.avgReturn')}
           value={formatCurrency(stats.expectancy)}
-          valueClass={stats.expectancy >= 0 ? 'text-profit' : 'text-loss-light'}
+          valueClass={stats.expectancy >= 0 ? 'neu-text-profit' : 'neu-text-loss'}
         />
         <StatCard
           icon={<Activity size={13} />}
@@ -131,10 +131,10 @@ export default function StatsPanel({ stats, hasTrades }: Props) {
       </div>
       {stats.currentStreak > 1 && (
         <div
-          className={`mt-3 flex items-center justify-center gap-2 rounded-xl py-2 text-sm font-semibold ${
+          className={`mt-3 flex items-center justify-center gap-2 neu-pill py-2 text-sm font-semibold ${
             stats.currentStreakType === 'win'
-              ? 'bg-profit/10 text-profit'
-              : 'bg-loss/10 text-loss-light'
+              ? 'neu-text-profit'
+              : 'neu-text-loss'
           }`}
         >
           <Flame size={15} />

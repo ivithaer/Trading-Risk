@@ -79,31 +79,34 @@ export default function BacktestInput({ trades, onChange }: Props) {
     }
   };
 
-  const resultColor = (r: number) => (r > 0 ? 'text-profit' : r < 0 ? 'text-loss-light' : 'text-ink-muted');
+  const resultColor = (r: number) => (r > 0 ? 'neu-text-profit' : r < 0 ? 'neu-text-loss' : 'neu-text-muted');
 
   return (
-    <div className="card p-5">
+    <div className="neu-card p-5">
       <div className="mb-4 flex items-center gap-2">
-        <Table size={18} className="text-gold" />
-        <h2 className="text-base font-semibold text-ink-primary">{t('rm.backtestResults')}</h2>
+        <Table size={18} className="neu-text-gold" />
+        <h2 className="text-base font-semibold neu-text-primary">{t('rm.backtestResults')}</h2>
       </div>
 
       <div className="mb-4 flex gap-2">
         <button
           onClick={() => setTab('manual')}
-          className={`toggle-btn ${tab === 'manual' ? 'toggle-btn-active' : 'toggle-btn-inactive'}`}
+          className={`neu-btn flex-1 px-3 py-2 text-sm font-medium transition-all ${tab === 'manual' ? 'neu-pressed neu-text-gold' : 'neu-text-secondary'}`}
+          style={{ borderRadius: '0.75rem' }}
         >
           {t('rm.manualEntry')}
         </button>
         <button
           onClick={() => setTab('quick')}
-          className={`toggle-btn ${tab === 'quick' ? 'toggle-btn-active' : 'toggle-btn-inactive'}`}
+          className={`neu-btn flex-1 px-3 py-2 text-sm font-medium transition-all ${tab === 'quick' ? 'neu-pressed neu-text-gold' : 'neu-text-secondary'}`}
+          style={{ borderRadius: '0.75rem' }}
         >
           {t('rm.quickEntry')}
         </button>
         <button
           onClick={() => setTab('csv')}
-          className={`toggle-btn ${tab === 'csv' ? 'toggle-btn-active' : 'toggle-btn-inactive'}`}
+          className={`neu-btn flex-1 px-3 py-2 text-sm font-medium transition-all ${tab === 'csv' ? 'neu-pressed neu-text-gold' : 'neu-text-secondary'}`}
+          style={{ borderRadius: '0.75rem' }}
         >
           {t('rm.csvImport')}
         </button>
@@ -111,30 +114,28 @@ export default function BacktestInput({ trades, onChange }: Props) {
 
       {tab === 'manual' && (
         <div className="space-y-3">
-          {/* Optional date & note */}
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <input
               type="date"
               value={newDate}
               onChange={(e) => setNewDate(e.target.value)}
-              className="input-field"
+              className="neu-input w-full px-4 py-2.5"
             />
             <input
               type="text"
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               placeholder={t('rm.notes')}
-              className="input-field"
+              className="neu-input w-full px-4 py-2.5"
             />
           </div>
 
-          {/* Separate buttons for each result type */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {/* TP button */}
             <div className="flex flex-col gap-1.5">
               <button
                 onClick={() => addTradeByType('TP', tpR)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-profit/15 px-3 py-2.5 text-sm font-bold text-profit transition-all hover:bg-profit/25 active:scale-95"
+                className="flex items-center justify-center gap-1.5 neu-btn neu-bg-profit-soft px-3 py-2.5 text-sm font-bold neu-text-profit transition-all active:scale-95"
+                style={{ borderRadius: '0.75rem' }}
               >
                 <TrendingUp size={16} />
                 {t('rm.tp')}
@@ -145,15 +146,15 @@ export default function BacktestInput({ trades, onChange }: Props) {
                 value={tpR}
                 onChange={(e) => setTpR(e.target.value)}
                 placeholder="R"
-                className="input-field text-center font-mono"
+                className="neu-input w-full px-3 py-2 text-center font-mono"
               />
             </div>
 
-            {/* SL button */}
             <div className="flex flex-col gap-1.5">
               <button
                 onClick={() => addTradeByType('SL', slR)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-loss/15 px-3 py-2.5 text-sm font-bold text-loss-light transition-all hover:bg-loss/25 active:scale-95"
+                className="flex items-center justify-center gap-1.5 neu-btn neu-bg-loss-soft px-3 py-2.5 text-sm font-bold neu-text-loss transition-all active:scale-95"
+                style={{ borderRadius: '0.75rem' }}
               >
                 <TrendingDown size={16} />
                 {t('rm.sl')}
@@ -164,15 +165,15 @@ export default function BacktestInput({ trades, onChange }: Props) {
                 value={slR}
                 onChange={(e) => setSlR(e.target.value)}
                 placeholder="R"
-                className="input-field text-center font-mono"
+                className="neu-input w-full px-3 py-2 text-center font-mono"
               />
             </div>
 
-            {/* BE button */}
             <div className="flex flex-col gap-1.5">
               <button
                 onClick={() => addTradeByType('BE', beR)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-base-500/20 px-3 py-2.5 text-sm font-bold text-ink-secondary transition-all hover:bg-base-500/30 active:scale-95"
+                className="flex items-center justify-center gap-1.5 neu-btn px-3 py-2.5 text-sm font-bold neu-text-secondary transition-all active:scale-95"
+                style={{ borderRadius: '0.75rem' }}
               >
                 <Minus size={16} />
                 {t('rm.be')}
@@ -183,15 +184,15 @@ export default function BacktestInput({ trades, onChange }: Props) {
                 value={beR}
                 onChange={(e) => setBeR(e.target.value)}
                 placeholder="R"
-                className="input-field text-center font-mono"
+                className="neu-input w-full px-3 py-2 text-center font-mono"
               />
             </div>
 
-            {/* Custom button */}
             <div className="flex flex-col gap-1.5">
               <button
                 onClick={() => addTradeByType('custom', customR)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-gold/15 px-3 py-2.5 text-sm font-bold text-gold transition-all hover:bg-gold/25 active:scale-95"
+                className="flex items-center justify-center gap-1.5 neu-btn neu-bg-gold-soft px-3 py-2.5 text-sm font-bold neu-text-gold transition-all active:scale-95"
+                style={{ borderRadius: '0.75rem' }}
               >
                 <SlidersHorizontal size={16} />
                 {t('rm.custom')}
@@ -202,17 +203,17 @@ export default function BacktestInput({ trades, onChange }: Props) {
                 value={customR}
                 onChange={(e) => setCustomR(e.target.value)}
                 placeholder="R"
-                className="input-field text-center font-mono"
+                className="neu-input w-full px-3 py-2 text-center font-mono"
               />
             </div>
           </div>
 
-          {/* Clear All on the left to avoid accidental clicks */}
           {trades.length > 0 && (
             <div className="flex justify-start">
               <button
                 onClick={clearAll}
-                className="flex items-center gap-1.5 rounded-xl border border-loss/30 px-4 py-2 text-sm font-medium text-loss-light transition-colors hover:bg-loss/10"
+                className="flex items-center gap-1.5 neu-btn px-4 py-2 text-sm font-medium neu-text-loss transition-colors"
+                style={{ borderRadius: '0.75rem' }}
               >
                 <Trash2 size={16} />
                 {t('rm.clearAll')}
@@ -228,25 +229,26 @@ export default function BacktestInput({ trades, onChange }: Props) {
             value={quickSeq}
             onChange={(e) => setQuickSeq(e.target.value)}
             placeholder={t('rm.quickSequence')}
-            className="input-field h-20 resize-none"
+            className="neu-input h-20 w-full resize-none px-4 py-2.5"
           />
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="label-text">{t('rm.winDefault')}</label>
-              <input type="number" step="0.01" value={winR} onChange={(e) => setWinR(e.target.value)} className="input-field" />
+              <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.winDefault')}</label>
+              <input type="number" step="0.01" value={winR} onChange={(e) => setWinR(e.target.value)} className="neu-input w-full px-4 py-2.5" />
             </div>
             <div>
-              <label className="label-text">{t('rm.lossDefault')}</label>
-              <input type="number" step="0.01" value={lossR} onChange={(e) => setLossR(e.target.value)} className="input-field" />
+              <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.lossDefault')}</label>
+              <input type="number" step="0.01" value={lossR} onChange={(e) => setLossR(e.target.value)} className="neu-input w-full px-4 py-2.5" />
             </div>
             <div>
-              <label className="label-text">{t('rm.beDefault')}</label>
-              <input type="number" step="0.01" value={quickBeR} onChange={(e) => setQuickBeR(e.target.value)} className="input-field" />
+              <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.beDefault')}</label>
+              <input type="number" step="0.01" value={quickBeR} onChange={(e) => setQuickBeR(e.target.value)} className="neu-input w-full px-4 py-2.5" />
             </div>
           </div>
           <button
             onClick={handleQuickConvert}
-            className="flex items-center gap-1.5 rounded-xl bg-gold px-4 py-2 text-sm font-bold text-base-900 transition-colors hover:bg-gold-light"
+            className="flex items-center gap-1.5 neu-btn px-4 py-2 text-sm font-bold neu-text-gold transition-colors"
+            style={{ borderRadius: '0.75rem' }}
           >
             <Zap size={16} />
             {t('rm.convert')}
@@ -259,21 +261,22 @@ export default function BacktestInput({ trades, onChange }: Props) {
           <input ref={fileRef} type="file" accept=".csv" onChange={handleFile} className="hidden" />
           <button
             onClick={() => fileRef.current?.click()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-base-500 bg-base-800 px-4 py-3 text-sm font-medium text-ink-secondary transition-colors hover:border-gold/40 hover:text-ink-primary"
+            className="flex w-full items-center justify-center gap-2 neu-btn px-4 py-3 text-sm font-medium neu-text-secondary transition-colors hover:neu-text-primary"
+            style={{ borderRadius: '0.75rem' }}
           >
             <Upload size={18} />
             {t('rm.csvFile')}
           </button>
           {csvPreview && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-ink-secondary">
+              <div className="flex items-center gap-2 text-sm neu-text-secondary">
                 <FileText size={14} />
                 {t('rm.csvPreview')} ({csvPreview.length})
               </div>
               {csvErrors.length > 0 ? (
-                <div className="rounded-xl border border-loss/30 bg-loss/5 p-3">
-                  <p className="mb-1 text-sm font-medium text-loss-light">{t('rm.csvErrors')}:</p>
-                  <ul className="text-xs text-loss-light">
+                <div className="neu-card-inset neu-bg-loss-soft p-3" style={{ borderRadius: '0.75rem' }}>
+                  <p className="mb-1 text-sm font-medium neu-text-loss">{t('rm.csvErrors')}:</p>
+                  <ul className="text-xs neu-text-loss">
                     {csvErrors.map((err, i) => (
                       <li key={i}>{err}</li>
                     ))}
@@ -281,9 +284,9 @@ export default function BacktestInput({ trades, onChange }: Props) {
                 </div>
               ) : (
                 <>
-                  <div className="max-h-40 overflow-y-auto rounded-xl border border-base-500/50">
+                  <div className="max-h-40 overflow-y-auto neu-card-inset" style={{ borderRadius: '0.75rem' }}>
                     <table className="w-full text-xs">
-                      <thead className="bg-base-800/80 text-ink-muted">
+                      <thead className="neu-text-muted" style={{ background: 'var(--neu-bg)' }}>
                         <tr>
                           <th className="p-2 text-start">#</th>
                           <th className="p-2 text-start">{t('rm.date')}</th>
@@ -293,10 +296,10 @@ export default function BacktestInput({ trades, onChange }: Props) {
                       </thead>
                       <tbody>
                         {csvPreview.slice(0, 20).map((tr) => (
-                          <tr key={tr.id} className="border-t border-base-500/30">
-                            <td className="p-2 text-ink-muted">{tr.index}</td>
-                            <td className="p-2 text-ink-secondary">{tr.date ?? '-'}</td>
-                            <td className="p-2 text-ink-secondary">{tr.result}</td>
+                          <tr key={tr.id} className="border-t" style={{ borderColor: 'var(--neu-shadow-dark)' }}>
+                            <td className="p-2 neu-text-muted">{tr.index}</td>
+                            <td className="p-2 neu-text-secondary">{tr.date ?? '-'}</td>
+                            <td className="p-2 neu-text-secondary">{tr.result}</td>
                             <td className={`p-2 text-end font-mono ${resultColor(tr.r)}`}>{tr.r > 0 ? '+' : ''}{tr.r}</td>
                           </tr>
                         ))}
@@ -305,7 +308,8 @@ export default function BacktestInput({ trades, onChange }: Props) {
                   </div>
                   <button
                     onClick={confirmCsvImport}
-                    className="rounded-xl bg-profit px-4 py-2 text-sm font-bold text-base-900 transition-colors hover:opacity-90"
+                    className="neu-btn px-4 py-2 text-sm font-bold neu-text-profit transition-colors"
+                    style={{ borderRadius: '0.75rem' }}
                   >
                     {t('rm.confirmImport')}
                   </button>
@@ -318,9 +322,9 @@ export default function BacktestInput({ trades, onChange }: Props) {
 
       {trades.length > 0 && (
         <div className="mt-4">
-          <div className="max-h-60 overflow-y-auto rounded-xl border border-base-500/50">
+          <div className="max-h-60 overflow-y-auto neu-card-inset" style={{ borderRadius: '0.75rem' }}>
             <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-base-800/90 text-ink-muted backdrop-blur-sm">
+              <thead className="sticky top-0 neu-text-muted" style={{ background: 'var(--neu-bg)' }}>
                 <tr>
                   <th className="p-2 text-start">#</th>
                   <th className="p-2 text-start">{t('rm.date')}</th>
@@ -332,14 +336,14 @@ export default function BacktestInput({ trades, onChange }: Props) {
               </thead>
               <tbody>
                 {trades.map((tr) => (
-                  <tr key={tr.id} className="border-t border-base-500/30 hover:bg-base-700/40">
-                    <td className="p-2 text-ink-muted">{tr.index}</td>
-                    <td className="p-2 text-ink-secondary">{tr.date ?? '-'}</td>
-                    <td className="p-2 text-ink-secondary">{tr.result}</td>
+                  <tr key={tr.id} className="border-t" style={{ borderColor: 'var(--neu-shadow-dark)' }}>
+                    <td className="p-2 neu-text-muted">{tr.index}</td>
+                    <td className="p-2 neu-text-secondary">{tr.date ?? '-'}</td>
+                    <td className="p-2 neu-text-secondary">{tr.result}</td>
                     <td className={`p-2 text-end font-mono ${resultColor(tr.r)}`}>{tr.r > 0 ? '+' : ''}{tr.r}</td>
-                    <td className="p-2 text-ink-muted">{tr.note ?? '-'}</td>
+                    <td className="p-2 neu-text-muted">{tr.note ?? '-'}</td>
                     <td className="p-2">
-                      <button onClick={() => deleteTrade(tr.id)} className="text-ink-muted hover:text-loss-light">
+                      <button onClick={() => deleteTrade(tr.id)} className="neu-text-muted hover:neu-text-loss">
                         <Trash2 size={12} />
                       </button>
                     </td>
@@ -352,7 +356,7 @@ export default function BacktestInput({ trades, onChange }: Props) {
       )}
 
       {trades.length === 0 && tab === 'manual' && (
-        <p className="py-6 text-center text-sm text-ink-muted">{t('rm.noTrades')}</p>
+        <p className="py-6 text-center text-sm neu-text-muted">{t('rm.noTrades')}</p>
       )}
     </div>
   );

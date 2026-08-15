@@ -21,15 +21,15 @@ function Gauge({ label, value, max, color, icon, suffix }: {
 }) {
   const pct = Math.min(100, (value / max) * 100);
   return (
-    <div className="rounded-xl border border-base-500/50 bg-base-800/60 p-4">
-      <div className="mb-2 flex items-center gap-2 text-ink-muted">
+    <div className="neu-card-inset p-4" style={{ borderRadius: '1rem' }}>
+      <div className="mb-2 flex items-center gap-2 neu-text-muted">
         {icon}
         <span className="text-xs">{label}</span>
       </div>
       <div className="mb-2 font-mono text-2xl font-bold" style={{ color }}>
         {formatNumber(value, 1)}{suffix}
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-base-600">
+      <div className="neu-track h-2.5 overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-700 ease-out"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -67,7 +67,7 @@ function Histogram({ data, bins, color, label, startingBalance }: {
 
   return (
     <div>
-      <div className="mb-2 text-xs text-ink-muted">{label}</div>
+      <div className="mb-2 text-xs neu-text-muted">{label}</div>
       <div className="flex h-24 items-end gap-px">
         {counts.map((c, i) => {
           const h = maxCount > 0 ? (c / maxCount) * 100 : 0;
@@ -78,7 +78,7 @@ function Histogram({ data, bins, color, label, startingBalance }: {
               className="flex-1 rounded-t-sm transition-all duration-500"
               style={{
                 height: `${h}%`,
-                backgroundColor: isProfit ? '#16C784' : '#EA3943',
+                backgroundColor: isProfit ? 'var(--neu-profit)' : 'var(--neu-loss)',
                 opacity: 0.4 + (h / 100) * 0.6,
                 minHeight: c > 0 ? '2px' : '0',
               }}
@@ -87,9 +87,9 @@ function Histogram({ data, bins, color, label, startingBalance }: {
           );
         })}
       </div>
-      <div className="mt-1 flex justify-between text-[10px] text-ink-muted">
+      <div className="mt-1 flex justify-between text-[10px] neu-text-muted">
         <span>{formatCurrency(min)}</span>
-        <span className="text-gold">{formatCurrency(startingBalance)}</span>
+        <span className="neu-text-gold">{formatCurrency(startingBalance)}</span>
         <span>{formatCurrency(max)}</span>
       </div>
     </div>
@@ -115,16 +115,16 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
   };
 
   return (
-    <div className="card p-5">
+    <div className="neu-card p-5">
       <div className="mb-4 flex items-center gap-2">
-        <Dices size={18} className="text-gold" />
-        <h2 className="text-base font-semibold text-ink-primary">{t('mc.simulatorTitle')}</h2>
+        <Dices size={18} className="neu-text-gold" />
+        <h2 className="text-base font-semibold neu-text-primary">{t('mc.simulatorTitle')}</h2>
       </div>
 
       {!canRun ? (
-        <div className="flex items-start gap-2 rounded-xl border border-gold/30 bg-gold/5 p-4">
-          <Info size={16} className="mt-0.5 shrink-0 text-gold" />
-          <p className="text-sm text-ink-secondary">
+        <div className="flex items-start gap-2 neu-card-inset neu-bg-gold-soft p-4" style={{ borderRadius: '0.75rem' }}>
+          <Info size={16} className="mt-0.5 shrink-0 neu-text-gold" />
+          <p className="text-sm neu-text-secondary">
             {t('mc.minTrades', { min: MIN_TRADES, current: trades.length })}
           </p>
         </div>
@@ -132,11 +132,11 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
         <>
           <div className="mb-4 flex flex-wrap items-end gap-3">
             <div>
-              <label className="label-text">{t('mc.numSimulations')}</label>
+              <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('mc.numSimulations')}</label>
               <select
                 value={numSimulations}
                 onChange={(e) => setNumSimulations(parseInt(e.target.value))}
-                className="input-field w-auto"
+                className="neu-input w-auto px-4 py-2.5"
                 disabled={running}
               >
                 {[100, 500, 1000, 5000, 10000].map((n) => (
@@ -148,12 +148,12 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
               type="button"
               onClick={handleRun}
               disabled={running}
-              className="flex items-center gap-1.5 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-base-900 transition-colors hover:bg-gold-light disabled:opacity-50"
+              className="flex items-center gap-1.5 neu-btn px-4 py-2.5 text-sm font-bold neu-text-gold transition-colors disabled:opacity-50"
             >
               {running ? <Loader2 size={16} className="animate-spin" /> : <Dices size={16} />}
               {running ? t('mc.running') : t('mc.run')}
             </button>
-            <div className="text-xs text-ink-muted">
+            <div className="text-xs neu-text-muted">
               {trades.length} {t('mc.tradesUsed')}
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
                   label={t('mc.probProfit')}
                   value={result.probProfit}
                   max={100}
-                  color="#16C784"
+                  color="var(--neu-profit)"
                   icon={<TrendingUp size={14} />}
                   suffix="%"
                 />
@@ -173,7 +173,7 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
                   label={t('mc.worstDrawdown')}
                   value={result.worstDrawdownPct}
                   max={100}
-                  color="#EA3943"
+                  color="var(--neu-loss)"
                   icon={<AlertTriangle size={14} />}
                   suffix="%"
                 />
@@ -181,35 +181,35 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
                   label={t('mc.probLargeLoss')}
                   value={result.probLargeLoss}
                   max={100}
-                  color="#F0B90B"
+                  color="var(--neu-gold)"
                   icon={<Shield size={14} />}
                   suffix="%"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-                <div className="rounded-xl border border-base-500/50 bg-base-800/60 p-3">
-                  <p className="text-xs text-ink-muted">{t('mc.avgFinal')}</p>
-                  <p className="font-mono text-base font-semibold text-ink-primary">{formatCurrency(result.avgFinalBalance)}</p>
+                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+                  <p className="text-xs neu-text-muted">{t('mc.avgFinal')}</p>
+                  <p className="font-mono text-base font-semibold neu-text-primary">{formatCurrency(result.avgFinalBalance)}</p>
                 </div>
-                <div className="rounded-xl border border-base-500/50 bg-base-800/60 p-3">
-                  <p className="text-xs text-ink-muted">{t('mc.medianFinal')}</p>
-                  <p className="font-mono text-base font-semibold text-ink-primary">{formatCurrency(result.medianFinalBalance)}</p>
+                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+                  <p className="text-xs neu-text-muted">{t('mc.medianFinal')}</p>
+                  <p className="font-mono text-base font-semibold neu-text-primary">{formatCurrency(result.medianFinalBalance)}</p>
                 </div>
-                <div className="rounded-xl border border-base-500/50 bg-base-800/60 p-3">
-                  <p className="text-xs text-ink-muted">{t('mc.bestFinal')}</p>
-                  <p className="font-mono text-base font-semibold text-profit">{formatCurrency(result.bestFinalBalance)}</p>
+                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+                  <p className="text-xs neu-text-muted">{t('mc.bestFinal')}</p>
+                  <p className="font-mono text-base font-semibold neu-text-profit">{formatCurrency(result.bestFinalBalance)}</p>
                 </div>
-                <div className="rounded-xl border border-base-500/50 bg-base-800/60 p-3">
-                  <p className="text-xs text-ink-muted">{t('mc.worstFinal')}</p>
-                  <p className="font-mono text-base font-semibold text-loss-light">{formatCurrency(result.worstFinalBalance)}</p>
+                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+                  <p className="text-xs neu-text-muted">{t('mc.worstFinal')}</p>
+                  <p className="font-mono text-base font-semibold neu-text-loss">{formatCurrency(result.worstFinalBalance)}</p>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-base-500/40 bg-base-800/40 p-3">
+              <div className="neu-card-inset p-3" style={{ borderRadius: '0.75rem' }}>
                 <div className="mb-2 flex items-center gap-1.5">
-                  <BarChart3 size={14} className="text-gold" />
-                  <span className="text-xs font-medium text-ink-secondary">{t('mc.percentiles')}</span>
+                  <BarChart3 size={14} className="neu-text-gold" />
+                  <span className="text-xs font-medium neu-text-secondary">{t('mc.percentiles')}</span>
                 </div>
                 <div className="grid grid-cols-5 gap-2 text-center">
                   {[
@@ -220,8 +220,8 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
                     { label: '95%', val: result.p95 },
                   ].map((p) => (
                     <div key={p.label}>
-                      <p className="text-xs text-ink-muted">{p.label}</p>
-                      <p className="font-mono text-sm font-semibold text-ink-primary">{formatCurrency(p.val)}</p>
+                      <p className="text-xs neu-text-muted">{p.label}</p>
+                      <p className="font-mono text-sm font-semibold neu-text-primary">{formatCurrency(p.val)}</p>
                     </div>
                   ))}
                 </div>
@@ -230,14 +230,14 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
               <Histogram
                 data={result.finalBalances}
                 bins={30}
-                color="#F0B90B"
+                color="var(--neu-gold)"
                 label={t('mc.distribution')}
                 startingBalance={startingBalance}
               />
 
-              <div className="flex items-start gap-2 rounded-xl border border-base-500/30 bg-base-900/40 p-3">
-                <Info size={14} className="mt-0.5 shrink-0 text-ink-muted" />
-                <p className="text-xs text-ink-muted">{t('mc.disclaimer')}</p>
+              <div className="flex items-start gap-2 neu-card-inset px-3 py-2" style={{ borderRadius: '0.75rem' }}>
+                <Info size={14} className="mt-0.5 shrink-0 neu-text-muted" />
+                <p className="text-xs neu-text-muted">{t('mc.disclaimer')}</p>
               </div>
             </div>
           )}

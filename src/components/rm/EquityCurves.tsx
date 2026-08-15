@@ -43,13 +43,12 @@ export default function EquityCurves({ results }: Props) {
   const yFor = (bal: number) => height - padding - ((bal - minBal) / range) * (height - padding * 2);
 
   return (
-    <div className="card p-5">
+    <div className="neu-card p-5">
       <div className="mb-3 flex items-center gap-2">
-        <LineChart size={18} className="text-gold" />
-        <h2 className="text-base font-semibold text-ink-primary">{t('rm.equityCurves')}</h2>
+        <LineChart size={18} className="neu-text-gold" />
+        <h2 className="text-base font-semibold neu-text-primary">{t('rm.equityCurves')}</h2>
       </div>
 
-      {/* Toggle buttons */}
       <div className="mb-3 flex flex-wrap gap-2">
         {results.map((r, i) => {
           const color = COLORS[i % COLORS.length];
@@ -58,21 +57,19 @@ export default function EquityCurves({ results }: Props) {
             <button
               key={r.systemId}
               onClick={() => toggle(r.systemId)}
-              className="flex items-center gap-1.5 rounded-lg border border-base-500 bg-base-800 px-2.5 py-1 text-xs font-medium transition-colors hover:border-base-400"
-              style={{ opacity: isVisible ? 1 : 0.4 }}
+              className="flex items-center gap-1.5 neu-btn px-2.5 py-1 text-xs font-medium transition-colors"
+              style={{ opacity: isVisible ? 1 : 0.4, borderRadius: '0.5rem' }}
             >
-              {isVisible ? <Eye size={12} style={{ color }} /> : <EyeOff size={12} className="text-ink-muted" />}
-              <span className="text-ink-secondary">{r.systemName}</span>
+              {isVisible ? <Eye size={12} style={{ color }} /> : <EyeOff size={12} className="neu-text-muted" />}
+              <span className="neu-text-secondary">{r.systemName}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Equity chart */}
       <div className="relative" onMouseLeave={() => setHover(null)}>
         <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-56 w-full">
-          {/* Starting balance line */}
-          <line x1={padding} y1={yFor(results[0].startingBalance)} x2={width - padding} y2={yFor(results[0].startingBalance)} stroke="#3A4156" strokeWidth="0.3" strokeDasharray="2 2" />
+          <line x1={padding} y1={yFor(results[0].startingBalance)} x2={width - padding} y2={yFor(results[0].startingBalance)} stroke="var(--neu-shadow-dark)" strokeWidth="0.3" strokeDasharray="2 2" />
           {results.map((r, i) => {
             if (!visible.has(r.systemId)) return null;
             const color = COLORS[i % COLORS.length];
@@ -106,30 +103,28 @@ export default function EquityCurves({ results }: Props) {
           })}
         </svg>
 
-        {/* Tooltip */}
         {hover && (
           <div
-            className="pointer-events-none absolute z-10 rounded-xl border border-base-500 bg-base-900/95 p-3 text-xs shadow-xl"
-            style={{ left: Math.min(hover.x + 8, 300), top: Math.max(hover.y - 80, 0) }}
+            className="pointer-events-none absolute z-10 neu-card p-3 text-xs"
+            style={{ left: Math.min(hover.x + 8, 300), top: Math.max(hover.y - 80, 0), borderRadius: '0.75rem' }}
           >
-            <p className="mb-1 font-semibold text-gold">{hover.data.sysName}</p>
-            <p className="text-ink-secondary">#{hover.data.trade} | {hover.data.result} | R: {hover.data.r > 0 ? '+' : ''}{hover.data.r}</p>
-            <p className="text-ink-secondary">{t('rm.riskApplied')}: {hover.data.riskPct.toFixed(2)}% | ${hover.data.riskAmount.toFixed(0)}</p>
-            <p className={hover.data.pnl >= 0 ? 'text-profit' : 'text-loss-light'}>{t('rm.pnl')}: {hover.data.pnl >= 0 ? '+' : ''}${hover.data.pnl.toFixed(0)}</p>
-            <p className="text-ink-primary">{t('rm.balAfter')}: ${hover.data.balance.toFixed(0)}</p>
-            <p className="text-loss-light">{t('rm.ddPct')}: {hover.data.drawdownPct.toFixed(1)}%</p>
+            <p className="mb-1 font-semibold neu-text-gold">{hover.data.sysName}</p>
+            <p className="neu-text-secondary">#{hover.data.trade} | {hover.data.result} | R: {hover.data.r > 0 ? '+' : ''}{hover.data.r}</p>
+            <p className="neu-text-secondary">{t('rm.riskApplied')}: {hover.data.riskPct.toFixed(2)}% | ${hover.data.riskAmount.toFixed(0)}</p>
+            <p className={hover.data.pnl >= 0 ? 'neu-text-profit' : 'neu-text-loss'}>{t('rm.pnl')}: {hover.data.pnl >= 0 ? '+' : ''}${hover.data.pnl.toFixed(0)}</p>
+            <p className="neu-text-primary">{t('rm.balAfter')}: ${hover.data.balance.toFixed(0)}</p>
+            <p className="neu-text-loss">{t('rm.ddPct')}: {hover.data.drawdownPct.toFixed(1)}%</p>
           </div>
         )}
       </div>
 
-      {/* Drawdown chart */}
       <div className="mt-4">
         <div className="mb-2 flex items-center gap-2">
-          <TrendingDown size={16} className="text-loss-light" />
-          <h3 className="text-sm font-semibold text-ink-secondary">{t('rm.drawdownCurve')}</h3>
+          <TrendingDown size={16} className="neu-text-loss" />
+          <h3 className="text-sm font-semibold neu-text-secondary">{t('rm.drawdownCurve')}</h3>
         </div>
         <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="h-32 w-full">
-          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#3A4156" strokeWidth="0.3" />
+          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="var(--neu-shadow-dark)" strokeWidth="0.3" />
           {results.map((r, i) => {
             if (!visible.has(r.systemId)) return null;
             const color = COLORS[i % COLORS.length];

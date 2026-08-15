@@ -36,72 +36,67 @@ export default function RiskManagementPage() {
 
   return (
     <div className="space-y-5">
-      {/* Step 1: Starting Balance */}
-      <div className="card p-5">
+      <div className="neu-card p-5">
         <div className="mb-3 flex items-center gap-2">
-          <Wallet size={18} className="text-gold" />
-          <h2 className="text-base font-semibold text-ink-primary">{t('rm.step1')}</h2>
+          <Wallet size={18} className="neu-text-gold" />
+          <h2 className="text-base font-semibold neu-text-primary">{t('rm.step1')}</h2>
         </div>
         <input
           type="number"
           step="100"
           value={startingBalance}
           onChange={(e) => setStartingBalance(parseFloat(e.target.value) || 0)}
-          className="input-field max-w-xs"
+          className="neu-input max-w-xs px-4 py-2.5 font-mono"
         />
       </div>
 
-      {/* Step 2: Backtest Results */}
       <div>
         <div className="mb-2 flex items-center gap-2">
-          <ListChecks size={18} className="text-gold" />
-          <h2 className="text-sm font-semibold text-ink-secondary">{t('rm.step2')}</h2>
+          <ListChecks size={18} className="neu-text-gold" />
+          <h2 className="text-sm font-semibold neu-text-secondary">{t('rm.step2')}</h2>
         </div>
         <BacktestInput trades={trades} onChange={setTrades} />
       </div>
 
-      {/* Step 3: Strategy Performance */}
       {trades.length > 0 && (
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <ListChecks size={18} className="text-gold" />
-            <h2 className="text-sm font-semibold text-ink-secondary">{t('rm.step3')}</h2>
+            <ListChecks size={18} className="neu-text-gold" />
+            <h2 className="text-sm font-semibold neu-text-secondary">{t('rm.step3')}</h2>
           </div>
           <StrategyStatsPanel stats={strategyStats} />
         </div>
       )}
 
-      {/* Step 4: Build Risk Systems */}
       {trades.length > 0 && (
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <ListChecks size={18} className="text-gold" />
-            <h2 className="text-sm font-semibold text-ink-secondary">{t('rm.step4')}</h2>
+            <ListChecks size={18} className="neu-text-gold" />
+            <h2 className="text-sm font-semibold neu-text-secondary">{t('rm.step4')}</h2>
           </div>
           <RiskSystemBuilder systems={systems} onChange={setSystems} />
         </div>
       )}
 
-      {/* Run Simulation + Goal/DD Limit */}
       {trades.length > 0 && systems.length > 0 && (
-        <div className="card p-5">
+        <div className="neu-card p-5">
           <div className="mb-3 flex items-center gap-2">
-            <Play size={18} className="text-gold" />
-            <h2 className="text-base font-semibold text-ink-primary">{t('rm.step5')}</h2>
+            <Play size={18} className="neu-text-gold" />
+            <h2 className="text-base font-semibold neu-text-primary">{t('rm.step5')}</h2>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
-              <label className="label-text">{t('rm.goal')}</label>
-              <input type="number" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="$12,000" className="input-field" />
+              <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.goal')}</label>
+              <input type="number" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="$12,000" className="neu-input w-full px-4 py-2.5" />
             </div>
             <div>
-              <label className="label-text">{t('rm.maxDDLimit')}</label>
-              <input type="number" step="0.5" value={ddLimit} onChange={(e) => setDdLimit(e.target.value)} placeholder="10%" className="input-field" />
+              <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.maxDDLimit')}</label>
+              <input type="number" step="0.5" value={ddLimit} onChange={(e) => setDdLimit(e.target.value)} placeholder="10%" className="neu-input w-full px-4 py-2.5" />
             </div>
             <div className="flex items-end">
               <button
                 onClick={handleRunAll}
-                className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-base-900 transition-colors hover:bg-gold-light"
+                className="flex w-full items-center justify-center gap-1.5 neu-btn px-4 py-2.5 text-sm font-bold neu-text-gold transition-colors"
               >
                 <Play size={16} />
                 {t('rm.runAll')}
@@ -111,30 +106,25 @@ export default function RiskManagementPage() {
         </div>
       )}
 
-      {/* Step 5: Comparison Table */}
       {results.length > 0 && <ComparisonTable results={results} />}
-
-      {/* Step 6: Equity Curves */}
       {results.length > 0 && <EquityCurves results={results} />}
 
-      {/* Step 7: Trade Details */}
       {results.length > 0 && (
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <Table2 size={18} className="text-gold" />
-            <h2 className="text-sm font-semibold text-ink-secondary">{t('rm.tradeDetails')}</h2>
+            <Table2 size={18} className="neu-text-gold" />
+            <h2 className="text-sm font-semibold neu-text-secondary">{t('rm.tradeDetails')}</h2>
           </div>
           {results.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-2">
-              {results.map((r, i) => (
+              {results.map((r) => (
                 <button
                   key={r.systemId}
                   onClick={() => setSelectedSysId(r.systemId)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-                    selectedSysId === r.systemId
-                      ? 'border-gold/50 bg-gold/10 text-gold'
-                      : 'border-base-500 bg-base-800 text-ink-secondary hover:border-base-400'
+                  className={`neu-btn px-3 py-1.5 text-xs font-medium transition-colors ${
+                    selectedSysId === r.systemId ? 'neu-pressed neu-text-gold' : 'neu-text-secondary'
                   }`}
+                  style={{ borderRadius: '0.5rem' }}
                 >
                   {r.systemName}
                 </button>
@@ -145,12 +135,11 @@ export default function RiskManagementPage() {
         </div>
       )}
 
-      {/* Step 8: Monte Carlo */}
       {results.length > 0 && (
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <Dices size={18} className="text-gold" />
-            <h2 className="text-sm font-semibold text-ink-secondary">{t('rm.monteCarlo')}</h2>
+            <Dices size={18} className="neu-text-gold" />
+            <h2 className="text-sm font-semibold neu-text-secondary">{t('rm.monteCarlo')}</h2>
           </div>
           <MonteCarloPanel trades={trades} system={selectedSystem} startingBalance={startingBalance} />
         </div>

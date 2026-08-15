@@ -41,15 +41,15 @@ export default function ComparisonTable({ results }: Props) {
   });
 
   return (
-    <div className="card p-5">
+    <div className="neu-card p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <GitCompare size={18} className="text-gold" />
-          <h2 className="text-base font-semibold text-ink-primary">{t('rm.comparison')}</h2>
+          <GitCompare size={18} className="neu-text-gold" />
+          <h2 className="text-base font-semibold neu-text-primary">{t('rm.comparison')}</h2>
         </div>
         <div className="flex items-center gap-1.5">
-          <ArrowUpDown size={14} className="text-ink-muted" />
-          <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className="input-field w-auto px-2 py-1.5 text-xs">
+          <ArrowUpDown size={14} className="neu-text-muted" />
+          <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className="neu-input w-auto px-2 py-1.5 text-xs">
             {SORT_OPTIONS.map((o) => (
               <option key={o.key} value={o.key}>{t(o.label)}</option>
             ))}
@@ -59,8 +59,8 @@ export default function ComparisonTable({ results }: Props) {
 
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
-          <thead className="text-ink-muted">
-            <tr className="border-b border-base-500/40">
+          <thead className="neu-text-muted">
+            <tr className="border-b" style={{ borderColor: 'var(--neu-shadow-dark)' }}>
               <th className="p-2 text-start">{t('rm.sysName')}</th>
               <th className="p-2 text-end">{t('rm.startBal')}</th>
               <th className="p-2 text-end">{t('rm.finalBal')}</th>
@@ -86,28 +86,28 @@ export default function ComparisonTable({ results }: Props) {
           </thead>
           <tbody>
             {sorted.map((r) => (
-              <tr key={r.systemId} className="border-b border-base-500/20 hover:bg-base-700/30">
-                <td className="p-2 font-medium text-ink-primary">{r.systemName}</td>
-                <td className="p-2 text-end font-mono text-ink-secondary">${r.startingBalance.toLocaleString('en-US')}</td>
-                <td className="p-2 text-end font-mono text-ink-primary">${r.finalBalance.toLocaleString('en-US', { maximumFractionDigits: 0 })}</td>
-                <td className={`p-2 text-end font-mono ${r.netPnl >= 0 ? 'text-profit' : 'text-loss-light'}`}>{fmtMoney(r.netPnl)}</td>
-                <td className={`p-2 text-end font-mono ${r.netPnlPct >= 0 ? 'text-profit' : 'text-loss-light'}`}>{r.netPnlPct >= 0 ? '+' : ''}{fmt(r.netPnlPct, 1)}%</td>
-                <td className="p-2 text-end font-mono text-loss-light">${fmt(r.maxDrawdown, 0)}</td>
-                <td className="p-2 text-end font-mono text-loss-light">{fmt(r.maxDrawdownPct, 1)}%</td>
-                <td className={`p-2 text-end font-mono ${r.profitFactor >= 1 ? 'text-profit' : 'text-loss-light'}`}>{fmt(r.profitFactor)}</td>
-                <td className="p-2 text-end font-mono text-ink-secondary">{r.totalTrades}</td>
-                <td className="p-2 text-end font-mono text-profit">{r.wins}</td>
-                <td className="p-2 text-end font-mono text-loss-light">{r.losses}</td>
-                <td className="p-2 text-end font-mono text-ink-muted">{r.breakEvens}</td>
-                <td className="p-2 text-end font-mono text-ink-secondary">{fmt(r.winRate, 1)}%</td>
-                <td className="p-2 text-end font-mono text-ink-secondary">{fmt(r.avgR)}</td>
-                <td className={`p-2 text-end font-mono ${r.totalR >= 0 ? 'text-profit' : 'text-loss-light'}`}>{r.totalR >= 0 ? '+' : ''}{fmt(r.totalR, 1)}</td>
-                <td className="p-2 text-end font-mono text-ink-secondary">{fmt(r.avgRiskPct, 2)}%</td>
-                <td className="p-2 text-end font-mono text-ink-secondary">{fmt(r.maxRiskPct, 2)}%</td>
-                <td className="p-2 text-end font-mono text-ink-secondary">{fmt(r.minRiskPct, 2)}%</td>
-                <td className="p-2 text-end font-mono text-loss-light">{r.longestLossStreak}</td>
-                <td className="p-2 text-end font-mono text-profit">{r.longestWinStreak}</td>
-                <td className="p-2 text-end font-mono text-ink-secondary">{fmt(r.recoveryFactor, 2)}</td>
+              <tr key={r.systemId} className="border-b" style={{ borderColor: 'var(--neu-shadow-dark)' }}>
+                <td className="p-2 font-medium neu-text-primary">{r.systemName}</td>
+                <td className="p-2 text-end font-mono neu-text-secondary">${r.startingBalance.toLocaleString('en-US')}</td>
+                <td className="p-2 text-end font-mono neu-text-primary">${r.finalBalance.toLocaleString('en-US', { maximumFractionDigits: 0 })}</td>
+                <td className={`p-2 text-end font-mono ${r.netPnl >= 0 ? 'neu-text-profit' : 'neu-text-loss'}`}>{fmtMoney(r.netPnl)}</td>
+                <td className={`p-2 text-end font-mono ${r.netPnlPct >= 0 ? 'neu-text-profit' : 'neu-text-loss'}`}>{r.netPnlPct >= 0 ? '+' : ''}{fmt(r.netPnlPct, 1)}%</td>
+                <td className="p-2 text-end font-mono neu-text-loss">${fmt(r.maxDrawdown, 0)}</td>
+                <td className="p-2 text-end font-mono neu-text-loss">{fmt(r.maxDrawdownPct, 1)}%</td>
+                <td className={`p-2 text-end font-mono ${r.profitFactor >= 1 ? 'neu-text-profit' : 'neu-text-loss'}`}>{fmt(r.profitFactor)}</td>
+                <td className="p-2 text-end font-mono neu-text-secondary">{r.totalTrades}</td>
+                <td className="p-2 text-end font-mono neu-text-profit">{r.wins}</td>
+                <td className="p-2 text-end font-mono neu-text-loss">{r.losses}</td>
+                <td className="p-2 text-end font-mono neu-text-muted">{r.breakEvens}</td>
+                <td className="p-2 text-end font-mono neu-text-secondary">{fmt(r.winRate, 1)}%</td>
+                <td className="p-2 text-end font-mono neu-text-secondary">{fmt(r.avgR)}</td>
+                <td className={`p-2 text-end font-mono ${r.totalR >= 0 ? 'neu-text-profit' : 'neu-text-loss'}`}>{r.totalR >= 0 ? '+' : ''}{fmt(r.totalR, 1)}</td>
+                <td className="p-2 text-end font-mono neu-text-secondary">{fmt(r.avgRiskPct, 2)}%</td>
+                <td className="p-2 text-end font-mono neu-text-secondary">{fmt(r.maxRiskPct, 2)}%</td>
+                <td className="p-2 text-end font-mono neu-text-secondary">{fmt(r.minRiskPct, 2)}%</td>
+                <td className="p-2 text-end font-mono neu-text-loss">{r.longestLossStreak}</td>
+                <td className="p-2 text-end font-mono neu-text-profit">{r.longestWinStreak}</td>
+                <td className="p-2 text-end font-mono neu-text-secondary">{fmt(r.recoveryFactor, 2)}</td>
               </tr>
             ))}
           </tbody>

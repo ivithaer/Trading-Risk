@@ -14,16 +14,16 @@ export default function RobustnessBadge({ result, isRecommended, recommendationR
   const { t } = useI18n();
 
   const confidenceLabel = result.confidenceWeight >= 0.9 ? t('robust.high') : result.confidenceWeight >= 0.55 ? t('robust.medium') : t('robust.low');
-  const confidenceColor = result.confidenceWeight >= 0.9 ? 'text-profit' : result.confidenceWeight >= 0.55 ? 'text-gold' : 'text-loss-light';
+  const confidenceColor = result.confidenceWeight >= 0.9 ? 'neu-text-profit' : result.confidenceWeight >= 0.55 ? 'neu-text-gold' : 'neu-text-loss';
 
   if (compact) {
     return (
       <div className="flex items-center gap-1.5 text-[10px]">
-        <Shield size={11} className="text-gold" />
+        <Shield size={11} className="neu-text-gold" />
         <span className="neu-text-muted">{t('robust.score')}:</span>
         <span className="font-mono font-semibold neu-text-primary">{formatNumber(result.totalScore, 1)}</span>
         {isRecommended && (
-          <span className="rounded-full bg-gold/15 px-1.5 py-0.5 text-[9px] font-bold text-gold">
+          <span className="neu-pill neu-bg-gold-soft px-1.5 py-0.5 text-[9px] font-bold neu-text-gold">
             {t('robust.recommended')}
           </span>
         )}
@@ -34,10 +34,10 @@ export default function RobustnessBadge({ result, isRecommended, recommendationR
   return (
     <div className="space-y-2">
       {isRecommended && (
-        <div className="flex items-start gap-1.5 rounded-lg bg-gold/10 px-2.5 py-2">
-          <Award size={13} className="mt-0.5 shrink-0 text-gold" />
+        <div className="flex items-start gap-1.5 neu-card-inset neu-bg-gold-soft px-2.5 py-2" style={{ borderRadius: '0.75rem' }}>
+          <Award size={13} className="mt-0.5 shrink-0 neu-text-gold" />
           <div>
-            <span className="text-[10px] font-bold text-gold">{t('robust.recommended')}</span>
+            <span className="text-[10px] font-bold neu-text-gold">{t('robust.recommended')}</span>
             {recommendationReason && (
               <p className="text-[10px] leading-relaxed neu-text-secondary">{recommendationReason}</p>
             )}
@@ -47,22 +47,22 @@ export default function RobustnessBadge({ result, isRecommended, recommendationR
 
       <div className="grid grid-cols-2 gap-1.5 text-[10px]">
         <div className="flex items-center gap-1">
-          <Shield size={10} className="text-gold" />
+          <Shield size={10} className="neu-text-gold" />
           <span className="neu-text-muted">{t('robust.score')}</span>
           <span className="font-mono font-semibold neu-text-primary ml-auto">{formatNumber(result.totalScore, 1)}</span>
         </div>
         <div className="flex items-center gap-1">
-          <TrendingUp size={10} className="text-gold" />
+          <TrendingUp size={10} className="neu-text-gold" />
           <span className="neu-text-muted">{t('robust.performance')}</span>
           <span className="font-mono font-semibold neu-text-primary ml-auto">{formatNumber(result.performanceScore, 1)}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Activity size={10} className="text-gold" />
+          <Activity size={10} className="neu-text-gold" />
           <span className="neu-text-muted">{t('robust.confidence')}</span>
           <span className={`font-semibold ml-auto ${confidenceColor}`}>{confidenceLabel}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Gauge size={10} className="text-gold" />
+          <Gauge size={10} className="neu-text-gold" />
           <span className="neu-text-muted">{t('robust.recovery')}</span>
           <span className="font-mono font-semibold neu-text-primary ml-auto">{formatNumber(result.recoveryFactor, 1)}</span>
         </div>
@@ -77,7 +77,7 @@ export default function RobustnessBadge({ result, isRecommended, recommendationR
       </div>
 
       {result.explanation && (
-        <div className="rounded-lg bg-base-800/40 px-2.5 py-1.5 text-[10px] leading-relaxed neu-text-muted">
+        <div className="neu-card-inset px-2.5 py-1.5 text-[10px] leading-relaxed neu-text-muted" style={{ borderRadius: '0.75rem' }}>
           {result.explanation}
         </div>
       )}

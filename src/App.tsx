@@ -186,33 +186,35 @@ function App() {
   return (
     <I18nContext.Provider value={{ lang, t, setLang }}>
       <div className="min-h-screen" style={{ backgroundColor: 'var(--neu-bg)' }} dir={dir}>
-        <header className="relative z-50 border-b border-base-500/40 bg-base-800/50 backdrop-blur-md">
+        <header className="relative z-50 neu-card-inset" style={{ borderRadius: 0 }}>
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-gold to-gold-dark shadow-lg shadow-gold/20">
-                <Coins size={22} className="text-base-900" />
+              <div className="flex h-10 w-10 items-center justify-center neu-icon-box" style={{ borderRadius: '0.75rem' }}>
+                <Coins size={22} className="neu-text-gold" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-ink-primary">{t('app.title')}</h1>
-                <p className="text-xs text-ink-secondary">{t('app.subtitle')}</p>
+                <h1 className="text-lg font-bold neu-text-primary">{t('app.title')}</h1>
+                <p className="text-xs neu-text-secondary">{t('app.subtitle')}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex rounded-xl border border-base-500/50 bg-base-800/60 p-1">
+              <div className="flex neu-card-inset p-1" style={{ borderRadius: '0.75rem' }}>
                 <button
                   onClick={() => setActiveTab('simulator')}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                    activeTab === 'simulator' ? 'bg-gold/15 text-gold' : 'text-ink-secondary hover:text-ink-primary'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all ${
+                    activeTab === 'simulator' ? 'neu-pressed neu-text-gold' : 'neu-text-secondary'
                   }`}
+                  style={{ borderRadius: '0.5rem' }}
                 >
                   <Coins size={14} />
                   {t('rm.simulatorTab')}
                 </button>
                 <button
                   onClick={() => setActiveTab('rmTester')}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                    activeTab === 'rmTester' ? 'bg-gold/15 text-gold' : 'text-ink-secondary hover:text-ink-primary'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all ${
+                    activeTab === 'rmTester' ? 'neu-pressed neu-text-gold' : 'neu-text-secondary'
                   }`}
+                  style={{ borderRadius: '0.5rem' }}
                 >
                   <FlaskConical size={14} />
                   {t('rm.testerTab')}
@@ -244,7 +246,7 @@ function App() {
                 tradeCount={trades.length}
                 maxTrades={settings.maxTrades}
               />
-              <div className="card p-6">
+              <div className="neu-card p-6">
                 <TradeButton
                   onExecute={handleExecute}
                   onReset={handleReset}
@@ -261,18 +263,18 @@ function App() {
               </div>
 
               {test5xRunning && (
-                <div className="card flex items-center gap-3 p-4">
-                  <Loader2 size={18} className="animate-spin text-gold" />
-                  <span className="text-sm text-ink-secondary">
+                <div className="neu-card flex items-center gap-3 p-4">
+                  <Loader2 size={18} className="animate-spin neu-text-gold" />
+                  <span className="text-sm neu-text-secondary">
                     {t('trade.testing', { cur: test5xProgress, total: VALIDATION_RUNS })}
                   </span>
                 </div>
               )}
 
               {test5xSaved && (
-                <div className="card flex items-center gap-3 border-profit/30 p-4">
-                  <CheckCircle2 size={18} className="text-profit" />
-                  <span className="text-sm text-profit">
+                <div className="neu-card neu-bg-profit-soft flex items-center gap-3 p-4">
+                  <CheckCircle2 size={18} className="neu-text-profit" />
+                  <span className="text-sm neu-text-profit">
                     {t('plans.validated', { wr: settings.winRate, tc: settings.maxTrades })}
                   </span>
                 </div>
@@ -308,15 +310,15 @@ function App() {
           {activeTab === 'simulator' && isComplete && (
             <div className="mt-5">
               <div
-                className={`card flex items-center justify-between p-5 ${
-                  stats.netPnl >= 0 ? 'border-profit/30' : 'border-loss/30'
+                className={`neu-card flex items-center justify-between p-5 ${
+                  stats.netPnl >= 0 ? 'neu-bg-profit-soft' : 'neu-bg-loss-soft'
                 }`}
               >
                 <div>
-                  <h3 className="text-lg font-bold text-ink-primary">{t('complete.title')}</h3>
-                  <p className="text-sm text-ink-secondary">
+                  <h3 className="text-lg font-bold neu-text-primary">{t('complete.title')}</h3>
+                  <p className="text-sm neu-text-secondary">
                     {t('complete.executed', { count: stats.totalTrades })}{' '}
-                    <span className={`font-mono font-semibold ${stats.netPnl >= 0 ? 'text-profit' : 'text-loss-light'}`}>
+                    <span className={`font-mono font-semibold ${stats.netPnl >= 0 ? 'neu-text-profit' : 'neu-text-loss'}`}>
                       {stats.netPnl >= 0 ? '+' : ''}${Math.abs(stats.netPnl).toFixed(2)} ({stats.netPnlPercent >= 0 ? '+' : ''}{stats.netPnlPercent.toFixed(1)}%)
                     </span>
                   </p>
@@ -324,7 +326,8 @@ function App() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="rounded-xl bg-gold px-5 py-2.5 text-sm font-bold text-base-900 transition-colors hover:bg-gold-light"
+                  className="neu-btn px-5 py-2.5 text-sm font-bold neu-text-gold transition-colors"
+                  style={{ borderRadius: '0.75rem' }}
                 >
                   {t('complete.newSim')}
                 </button>
@@ -332,12 +335,21 @@ function App() {
             </div>
           )}
 
-          {activeTab === 'simulator' && (
-          <footer className="mt-8 border-t border-base-500/30 pt-4 text-center text-xs text-ink-muted">
-            <p>{t('footer.disclaimer')}</p>
-          </footer>
-          )}
         </main>
+
+        <footer className="mx-auto max-w-7xl px-4 pb-6 pt-2 text-center sm:px-6">
+          <p className="text-xs neu-text-muted">{t('footer.disclaimer')}</p>
+          <p
+            className="mt-3 neu-text-muted"
+            style={{
+              fontSize: '13px',
+              fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
+              letterSpacing: '0.5px',
+            }}
+          >
+            @mutadawel
+          </p>
+        </footer>
       </div>
     </I18nContext.Provider>
   );
