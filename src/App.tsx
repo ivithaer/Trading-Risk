@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Coins, Loader2, CheckCircle2, FlaskConical } from 'lucide-react';
+import { Coins, Loader2, CheckCircle2, FlaskConical, Link2 } from 'lucide-react';
 import type { Settings, Trade, Stats } from '@/types';
 import TestResultsPanel from '@/components/TestResultsPanel';
 import {
@@ -26,10 +26,14 @@ import LanguageSelector from '@/components/LanguageSelector';
 import RiskManagementPage from '@/components/rm/RiskManagementPage';
 import MonteCarloSimulatorPanel from '@/components/MonteCarloSimulatorPanel';
 import ThemeToggle from '@/components/ThemeToggle';
+import AuthPanel from '@/components/AuthPanel';
+import MT5SyncPanel from '@/components/MT5SyncPanel';
+import { useAuth } from '@/lib/auth';
 
 const VALIDATION_RUNS = 5;
 
 function App() {
+  const { user } = useAuth();
   const [lang, setLang] = useState<Lang>('ar');
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [trades, setTrades] = useState<Trade[]>([]);
@@ -43,7 +47,7 @@ function App() {
   const [test5xAggregate, setTest5xAggregate] = useState<Stats | null>(null);
   const [test5xScore, setTest5xScore] = useState(0);
   const [test5xSaved, setTest5xSaved] = useState(false);
-  const [activeTab, setActiveTab] = useState<'simulator' | 'rmTester'>('simulator');
+  const [activeTab, setActiveTab] = useState<'simulator' | 'rmTester' | 'mt5'>('simulator');
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
@@ -213,11 +217,23 @@ function App() {
                   onClick={() => setActiveTab('rmTester')}
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all ${
                     activeTab === 'rmTester' ? 'neu-pressed neu-text-gold' : 'neu-text-secondary'
-                  }`}
+                  }`
+                  }
                   style={{ borderRadius: '0.5rem' }}
                 >
                   <FlaskConical size={14} />
                   {t('rm.testerTab')}
+                </button>
+                <button
+                  onClick={() => setActiveTab('mt5')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all ${
+                    activeTab === 'mt5' ? 'neu-pressed neu-text-gold' : 'neu-text-secondary'
+                  }`
+                  }
+                  style={{ borderRadius: '0.5rem' }}
+                >
+                  <Link2 size={14} />
+                  {t('app.mt5Tab')}
                 </button>
               </div>
               <LanguageSelector />
@@ -229,6 +245,15 @@ function App() {
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           {activeTab === 'rmTester' ? (
           <RiskManagementPage />
+          ) : activeTab === 'mt5' ? (
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+            <div className="space-y-5 lg:col-span-4">
+              <AuthPanel />
+            </div>
+            <div className="space-y-5 lg:col-span-8">
+              <MT5SyncPanel />
+            </div>
+          </div>
           ) : (
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
             <div className="space-y-5 lg:col-span-3">
