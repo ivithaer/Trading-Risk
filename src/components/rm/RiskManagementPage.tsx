@@ -3,6 +3,7 @@ import { Wallet, Play, ListChecks, Table2, Dices } from 'lucide-react';
 import type { BacktestTrade, RiskSystem, SimResult, StrategyStats as StratStats } from '@/lib/rmTypes';
 import { computeStrategyStats, runSimulation } from '@/lib/rmEngine';
 import { useI18n } from '@/lib/i18n';
+import DecimalInput from '@/components/DecimalInput';
 import BacktestInput from '@/components/rm/BacktestInput';
 import StrategyStatsPanel from '@/components/rm/StrategyStatsPanel';
 import RiskSystemBuilder from '@/components/rm/RiskSystemBuilder';
@@ -18,8 +19,8 @@ export default function RiskManagementPage() {
   const [systems, setSystems] = useState<RiskSystem[]>([]);
   const [results, setResults] = useState<SimResult[]>([]);
   const [selectedSysId, setSelectedSysId] = useState<string | null>(null);
-  const [goal, setGoal] = useState('');
-  const [ddLimit, setDdLimit] = useState('');
+  const [goal, setGoal] = useState(0);
+  const [ddLimit, setDdLimit] = useState(0);
 
   const strategyStats: StratStats = useMemo(() => computeStrategyStats(trades), [trades]);
 
@@ -27,8 +28,8 @@ export default function RiskManagementPage() {
   const selectedSystem = systems.find((s) => s.id === selectedSysId) ?? null;
 
   const handleRunAll = () => {
-    const goalNum = goal ? parseFloat(goal) : undefined;
-    const ddNum = ddLimit ? parseFloat(ddLimit) : undefined;
+    const goalNum = goal > 0 ? goal : undefined;
+    const ddNum = ddLimit > 0 ? ddLimit : undefined;
     const simResults = systems.map((sys) => runSimulation(trades, sys, startingBalance, goalNum, ddNum));
     setResults(simResults);
     if (simResults.length > 0) setSelectedSysId(simResults[0].systemId);
@@ -41,11 +42,9 @@ export default function RiskManagementPage() {
           <Wallet size={18} className="neu-text-gold" />
           <h2 className="text-base font-semibold neu-text-primary">{t('rm.step1')}</h2>
         </div>
-        <input
-          type="number"
-          step="100"
+        <DecimalInput
           value={startingBalance}
-          onChange={(e) => setStartingBalance(parseFloat(e.target.value) || 0)}
+          onChange={setStartingBalance}
           className="neu-input max-w-xs px-4 py-2.5 font-mono"
         />
       </div>
@@ -87,11 +86,11 @@ export default function RiskManagementPage() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
               <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.goal')}</label>
-              <input type="number" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="$12,000" className="neu-input w-full px-4 py-2.5" />
+              <DecimalInput value={goal} onChange={setGoal} placeholder="$12,000" className="neu-input w-full px-4 py-2.5" />
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.maxDDLimit')}</label>
-              <input type="number" step="0.5" value={ddLimit} onChange={(e) => setDdLimit(e.target.value)} placeholder="10%" className="neu-input w-full px-4 py-2.5" />
+              <DecimalInput value={ddLimit} onChange={setDdLimit} placeholder="10%" className="neu-input w-full px-4 py-2.5" />
             </div>
             <div className="flex items-end">
               <button

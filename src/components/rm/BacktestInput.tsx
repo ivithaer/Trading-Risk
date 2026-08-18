@@ -3,6 +3,7 @@ import { Trash2, Upload, FileText, Zap, Table, TrendingUp, TrendingDown, Minus, 
 import type { BacktestTrade, BacktestResult } from '@/lib/rmTypes';
 import { parseCsv, quickEntryToTrades } from '@/lib/rmEngine';
 import { useI18n } from '@/lib/i18n';
+import DecimalInput from '@/components/DecimalInput';
 
 interface Props {
   trades: BacktestTrade[];
@@ -134,17 +135,15 @@ export default function BacktestInput({ trades, onChange }: Props) {
             <div className="flex flex-col gap-1.5">
               <button
                 onClick={() => addTradeByType('TP', tpR)}
-                className="flex items-center justify-center gap-1.5 neu-btn neu-bg-profit-soft px-3 py-2.5 text-sm font-bold neu-text-profit transition-all active:scale-95"
-                style={{ borderRadius: '0.75rem' }}
+                className="flex items-center justify-center gap-1.5 neu-btn neu-bg-profit-soft px-3 py-2.5 text-sm font-bold neu-text-profit"
+                style={{ borderRadius: '0.75rem', touchAction: 'manipulation' }}
               >
                 <TrendingUp size={16} />
                 {t('rm.tp')}
               </button>
-              <input
-                type="number"
-                step="0.01"
-                value={tpR}
-                onChange={(e) => setTpR(e.target.value)}
+              <DecimalInput
+                value={parseFloat(tpR) || 0}
+                onChange={(v) => setTpR(String(v))}
                 placeholder="R"
                 className="neu-input w-full px-3 py-2 text-center font-mono"
               />
@@ -153,17 +152,15 @@ export default function BacktestInput({ trades, onChange }: Props) {
             <div className="flex flex-col gap-1.5">
               <button
                 onClick={() => addTradeByType('SL', slR)}
-                className="flex items-center justify-center gap-1.5 neu-btn neu-bg-loss-soft px-3 py-2.5 text-sm font-bold neu-text-loss transition-all active:scale-95"
-                style={{ borderRadius: '0.75rem' }}
+                className="flex items-center justify-center gap-1.5 neu-btn neu-bg-loss-soft px-3 py-2.5 text-sm font-bold neu-text-loss"
+                style={{ borderRadius: '0.75rem', touchAction: 'manipulation' }}
               >
                 <TrendingDown size={16} />
                 {t('rm.sl')}
               </button>
-              <input
-                type="number"
-                step="0.01"
-                value={slR}
-                onChange={(e) => setSlR(e.target.value)}
+              <DecimalInput
+                value={parseFloat(slR) || 0}
+                onChange={(v) => setSlR(String(v))}
                 placeholder="R"
                 className="neu-input w-full px-3 py-2 text-center font-mono"
               />
@@ -172,17 +169,15 @@ export default function BacktestInput({ trades, onChange }: Props) {
             <div className="flex flex-col gap-1.5">
               <button
                 onClick={() => addTradeByType('BE', beR)}
-                className="flex items-center justify-center gap-1.5 neu-btn px-3 py-2.5 text-sm font-bold neu-text-secondary transition-all active:scale-95"
-                style={{ borderRadius: '0.75rem' }}
+                className="flex items-center justify-center gap-1.5 neu-btn px-3 py-2.5 text-sm font-bold neu-text-secondary"
+                style={{ borderRadius: '0.75rem', touchAction: 'manipulation' }}
               >
                 <Minus size={16} />
                 {t('rm.be')}
               </button>
-              <input
-                type="number"
-                step="0.01"
-                value={beR}
-                onChange={(e) => setBeR(e.target.value)}
+              <DecimalInput
+                value={parseFloat(beR) || 0}
+                onChange={(v) => setBeR(String(v))}
                 placeholder="R"
                 className="neu-input w-full px-3 py-2 text-center font-mono"
               />
@@ -191,17 +186,15 @@ export default function BacktestInput({ trades, onChange }: Props) {
             <div className="flex flex-col gap-1.5">
               <button
                 onClick={() => addTradeByType('custom', customR)}
-                className="flex items-center justify-center gap-1.5 neu-btn neu-bg-gold-soft px-3 py-2.5 text-sm font-bold neu-text-gold transition-all active:scale-95"
-                style={{ borderRadius: '0.75rem' }}
+                className="flex items-center justify-center gap-1.5 neu-btn neu-bg-gold-soft px-3 py-2.5 text-sm font-bold neu-text-gold"
+                style={{ borderRadius: '0.75rem', touchAction: 'manipulation' }}
               >
                 <SlidersHorizontal size={16} />
                 {t('rm.custom')}
               </button>
-              <input
-                type="number"
-                step="0.01"
-                value={customR}
-                onChange={(e) => setCustomR(e.target.value)}
+              <DecimalInput
+                value={parseFloat(customR) || 0}
+                onChange={(v) => setCustomR(String(v))}
                 placeholder="R"
                 className="neu-input w-full px-3 py-2 text-center font-mono"
               />
@@ -234,15 +227,15 @@ export default function BacktestInput({ trades, onChange }: Props) {
           <div className="grid grid-cols-3 gap-2">
             <div>
               <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.winDefault')}</label>
-              <input type="number" step="0.01" value={winR} onChange={(e) => setWinR(e.target.value)} className="neu-input w-full px-4 py-2.5" />
+              <DecimalInput value={parseFloat(winR) || 0} onChange={(v) => setWinR(String(v))} className="neu-input w-full px-4 py-2.5" />
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.lossDefault')}</label>
-              <input type="number" step="0.01" value={lossR} onChange={(e) => setLossR(e.target.value)} className="neu-input w-full px-4 py-2.5" />
+              <DecimalInput value={parseFloat(lossR) || 0} onChange={(v) => setLossR(String(v))} className="neu-input w-full px-4 py-2.5" />
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.beDefault')}</label>
-              <input type="number" step="0.01" value={quickBeR} onChange={(e) => setQuickBeR(e.target.value)} className="neu-input w-full px-4 py-2.5" />
+              <DecimalInput value={parseFloat(quickBeR) || 0} onChange={(v) => setQuickBeR(String(v))} className="neu-input w-full px-4 py-2.5" />
             </div>
           </div>
           <button

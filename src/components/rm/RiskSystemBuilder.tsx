@@ -3,6 +3,7 @@ import { Plus, Trash2, Copy, Settings2, Zap, Info, X } from 'lucide-react';
 import type { RiskSystem, RiskRule, RuleCondition, RuleConditionType, RuleActionType, RiskCalcMethod, Betreatment } from '@/lib/rmTypes';
 import { PRESET_SYSTEMS, createDefaultSystem } from '@/lib/rmPresets';
 import { useI18n } from '@/lib/i18n';
+import DecimalInput from '@/components/DecimalInput';
 
 interface Props {
   systems: RiskSystem[];
@@ -198,15 +199,15 @@ export default function RiskSystemBuilder({ systems, onChange }: Props) {
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <div>
                       <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.baseRisk')}</label>
-                      <input type="number" step="0.1" value={sys.baseRiskPct} onChange={(e) => updateSystem(sys.id, { baseRiskPct: parseFloat(e.target.value) || 0 })} className="neu-input w-full px-4 py-2.5" />
+                      <DecimalInput value={sys.baseRiskPct} onChange={(v) => updateSystem(sys.id, { baseRiskPct: v })} className="neu-input w-full px-4 py-2.5" />
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.minRisk')}</label>
-                      <input type="number" step="0.25" value={sys.minRiskPct} onChange={(e) => updateSystem(sys.id, { minRiskPct: parseFloat(e.target.value) || 0 })} className="neu-input w-full px-4 py-2.5" />
+                      <DecimalInput value={sys.minRiskPct} onChange={(v) => updateSystem(sys.id, { minRiskPct: v })} className="neu-input w-full px-4 py-2.5" />
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.maxRisk')}</label>
-                      <input type="number" step="0.5" value={sys.maxRiskPct} onChange={(e) => updateSystem(sys.id, { maxRiskPct: parseFloat(e.target.value) || 0 })} className="neu-input w-full px-4 py-2.5" />
+                      <DecimalInput value={sys.maxRiskPct} onChange={(v) => updateSystem(sys.id, { maxRiskPct: v })} className="neu-input w-full px-4 py-2.5" />
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.calcMethod')}</label>
@@ -239,19 +240,19 @@ export default function RiskSystemBuilder({ systems, onChange }: Props) {
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                       <div>
                         <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.commission')}</label>
-                        <input type="number" step="0.01" value={sys.costs.commission} onChange={(e) => updateSystem(sys.id, { costs: { ...sys.costs, commission: parseFloat(e.target.value) || 0 } })} className="neu-input w-full px-4 py-2.5" />
+                        <DecimalInput value={sys.costs.commission} onChange={(v) => updateSystem(sys.id, { costs: { ...sys.costs, commission: v } })} className="neu-input w-full px-4 py-2.5" />
                       </div>
                       <div>
                         <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.spread')}</label>
-                        <input type="number" step="0.01" value={sys.costs.spread} onChange={(e) => updateSystem(sys.id, { costs: { ...sys.costs, spread: parseFloat(e.target.value) || 0 } })} className="neu-input w-full px-4 py-2.5" />
+                        <DecimalInput value={sys.costs.spread} onChange={(v) => updateSystem(sys.id, { costs: { ...sys.costs, spread: v } })} className="neu-input w-full px-4 py-2.5" />
                       </div>
                       <div>
                         <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.slippage')}</label>
-                        <input type="number" step="0.01" value={sys.costs.slippage} onChange={(e) => updateSystem(sys.id, { costs: { ...sys.costs, slippage: parseFloat(e.target.value) || 0 } })} className="neu-input w-full px-4 py-2.5" />
+                        <DecimalInput value={sys.costs.slippage} onChange={(v) => updateSystem(sys.id, { costs: { ...sys.costs, slippage: v } })} className="neu-input w-full px-4 py-2.5" />
                       </div>
                       <div>
                         <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.fixedCost')}</label>
-                        <input type="number" step="0.01" value={sys.costs.fixedCost} onChange={(e) => updateSystem(sys.id, { costs: { ...sys.costs, fixedCost: parseFloat(e.target.value) || 0 } })} className="neu-input w-full px-4 py-2.5" />
+                        <DecimalInput value={sys.costs.fixedCost} onChange={(v) => updateSystem(sys.id, { costs: { ...sys.costs, fixedCost: v } })} className="neu-input w-full px-4 py-2.5" />
                       </div>
                     </div>
                   </div>
@@ -313,13 +314,11 @@ export default function RiskSystemBuilder({ systems, onChange }: Props) {
                                     <option value="==">==</option>
                                     <option value="!=">!=</option>
                                   </select>
-                                  <input
-                                    type="number"
-                                    step="0.1"
+                                  <DecimalInput
                                     value={cond.value}
-                                    onChange={(e) => {
+                                    onChange={(v) => {
                                       const newConds = [...rule.conditions];
-                                      newConds[ci] = { ...cond, value: parseFloat(e.target.value) || 0 };
+                                      newConds[ci] = { ...cond, value: v };
                                       updateRule(sys.id, rule.id, { conditions: newConds });
                                     }}
                                     className="neu-input w-20 px-2 py-1 text-xs"
@@ -355,11 +354,9 @@ export default function RiskSystemBuilder({ systems, onChange }: Props) {
                                   ))}
                                 </select>
                                 {rule.action.type !== 'resetRisk' && rule.action.type !== 'stopTrading' && (
-                                  <input
-                                    type="number"
-                                    step="0.1"
+                                  <DecimalInput
                                     value={rule.action.value}
-                                    onChange={(e) => updateRule(sys.id, rule.id, { action: { ...rule.action, value: parseFloat(e.target.value) || 0 } })}
+                                    onChange={(v) => updateRule(sys.id, rule.id, { action: { ...rule.action, value: v } })}
                                     className="neu-input w-20 px-2 py-1 text-xs"
                                   />
                                 )}

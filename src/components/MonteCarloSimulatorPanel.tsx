@@ -26,7 +26,7 @@ function Gauge({ label, value, max, color, icon, suffix }: {
         {icon}
         <span className="text-xs">{label}</span>
       </div>
-      <div className="mb-2 font-mono text-2xl font-bold" style={{ color }}>
+      <div className="mb-2 font-mono text-xl font-bold sm:text-2xl" style={{ color, overflowWrap: 'break-word', wordBreak: 'break-all' }}>
         {formatNumber(value, 1)}{suffix}
       </div>
       <div className="neu-track h-2.5 overflow-hidden">
@@ -188,21 +188,21 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
               </div>
 
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
                   <p className="text-xs neu-text-muted">{t('mc.avgFinal')}</p>
-                  <p className="font-mono text-base font-semibold neu-text-primary">{formatCurrency(result.avgFinalBalance)}</p>
+                  <p className="font-mono text-sm font-semibold neu-text-primary sm:text-base" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>{formatCurrency(result.avgFinalBalance)}</p>
                 </div>
-                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
                   <p className="text-xs neu-text-muted">{t('mc.medianFinal')}</p>
-                  <p className="font-mono text-base font-semibold neu-text-primary">{formatCurrency(result.medianFinalBalance)}</p>
+                  <p className="font-mono text-sm font-semibold neu-text-primary sm:text-base" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>{formatCurrency(result.medianFinalBalance)}</p>
                 </div>
-                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
                   <p className="text-xs neu-text-muted">{t('mc.bestFinal')}</p>
-                  <p className="font-mono text-base font-semibold neu-text-profit">{formatCurrency(result.bestFinalBalance)}</p>
+                  <p className="font-mono text-sm font-semibold neu-text-profit sm:text-base" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>{formatCurrency(result.bestFinalBalance)}</p>
                 </div>
-                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+                <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
                   <p className="text-xs neu-text-muted">{t('mc.worstFinal')}</p>
-                  <p className="font-mono text-base font-semibold neu-text-loss">{formatCurrency(result.worstFinalBalance)}</p>
+                  <p className="font-mono text-sm font-semibold neu-text-loss sm:text-base" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>{formatCurrency(result.worstFinalBalance)}</p>
                 </div>
               </div>
 
@@ -211,7 +211,7 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
                   <BarChart3 size={14} className="neu-text-gold" />
                   <span className="text-xs font-medium neu-text-secondary">{t('mc.percentiles')}</span>
                 </div>
-                <div className="grid grid-cols-5 gap-2 text-center">
+                <div className="grid grid-cols-5 gap-1 text-center sm:gap-2">
                   {[
                     { label: '5%', val: result.p5 },
                     { label: '25%', val: result.p25 },
@@ -219,9 +219,9 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
                     { label: '75%', val: result.p75 },
                     { label: '95%', val: result.p95 },
                   ].map((p) => (
-                    <div key={p.label}>
+                    <div key={p.label} style={{ overflow: 'hidden' }}>
                       <p className="text-xs neu-text-muted">{p.label}</p>
-                      <p className="font-mono text-sm font-semibold neu-text-primary">{formatCurrency(p.val)}</p>
+                      <p className="font-mono text-xs font-semibold neu-text-primary sm:text-sm" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>{formatCurrency(p.val)}</p>
                     </div>
                   ))}
                 </div>

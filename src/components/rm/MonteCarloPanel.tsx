@@ -3,6 +3,7 @@ import { Dices, Loader2, Target, AlertTriangle, Info } from 'lucide-react';
 import type { BacktestTrade, RiskSystem, MonteCarloResult } from '@/lib/rmTypes';
 import { runMonteCarlo } from '@/lib/rmEngine';
 import { useI18n } from '@/lib/i18n';
+import DecimalInput from '@/components/DecimalInput';
 
 interface Props {
   trades: BacktestTrade[];
@@ -20,8 +21,8 @@ function fmt(n: number, dec = 2): string {
 export default function MonteCarloPanel({ trades, system, startingBalance }: Props) {
   const { t } = useI18n();
   const [numRuns, setNumRuns] = useState(1000);
-  const [goal, setGoal] = useState('');
-  const [ddLimit, setDdLimit] = useState('10');
+  const [goal, setGoal] = useState(0);
+  const [ddLimit, setDdLimit] = useState(10);
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<MonteCarloResult | null>(null);
 
@@ -29,8 +30,8 @@ export default function MonteCarloPanel({ trades, system, startingBalance }: Pro
     if (!system || trades.length === 0) return;
     setRunning(true);
     setResult(null);
-    const goalNum = goal ? parseFloat(goal) : undefined;
-    const ddNum = parseFloat(ddLimit) || undefined;
+    const goalNum = goal > 0 ? goal : undefined;
+    const ddNum = ddLimit > 0 ? ddLimit : undefined;
     await new Promise((r) => setTimeout(r, 50));
     const mc = runMonteCarlo(trades, system, startingBalance, numRuns, goalNum, ddNum);
     setResult(mc);
@@ -55,11 +56,11 @@ export default function MonteCarloPanel({ trades, system, startingBalance }: Pro
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.goal')}</label>
-          <input type="number" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="$12,000" className="neu-input w-full px-4 py-2.5" />
+          <DecimalInput value={goal} onChange={setGoal} placeholder="$12,000" className="neu-input w-full px-4 py-2.5" />
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('rm.maxDDLimit')}</label>
-          <input type="number" step="0.5" value={ddLimit} onChange={(e) => setDdLimit(e.target.value)} placeholder="10" className="neu-input w-full px-4 py-2.5" />
+          <DecimalInput value={ddLimit} onChange={setDdLimit} placeholder="10" className="neu-input w-full px-4 py-2.5" />
         </div>
       </div>
 
@@ -75,35 +76,35 @@ export default function MonteCarloPanel({ trades, system, startingBalance }: Pro
       {result && (
         <div className="mt-4 space-y-3">
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
               <p className="text-xs neu-text-muted">{t('rm.mcAvgFinal')}</p>
-              <p className="font-mono text-lg font-semibold neu-text-primary">${fmt(result.avgFinalBalance, 0)}</p>
+              <p className="font-mono text-base font-semibold neu-text-primary sm:text-lg" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>${fmt(result.avgFinalBalance, 0)}</p>
             </div>
-            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
               <p className="text-xs neu-text-muted">{t('rm.mcMedian')}</p>
-              <p className="font-mono text-lg font-semibold neu-text-primary">${fmt(result.medianFinalBalance, 0)}</p>
+              <p className="font-mono text-base font-semibold neu-text-primary sm:text-lg" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>${fmt(result.medianFinalBalance, 0)}</p>
             </div>
-            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
               <p className="text-xs neu-text-muted">{t('rm.mcBest')}</p>
-              <p className="font-mono text-lg font-semibold neu-text-profit">${fmt(result.bestResult, 0)}</p>
+              <p className="font-mono text-base font-semibold neu-text-profit sm:text-lg" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>${fmt(result.bestResult, 0)}</p>
             </div>
-            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
               <p className="text-xs neu-text-muted">{t('rm.mcWorst')}</p>
-              <p className="font-mono text-lg font-semibold neu-text-loss">${fmt(result.worstResult, 0)}</p>
+              <p className="font-mono text-base font-semibold neu-text-loss sm:text-lg" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>${fmt(result.worstResult, 0)}</p>
             </div>
-            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
               <p className="text-xs neu-text-muted">{t('rm.mcAvgDD')}</p>
-              <p className="font-mono text-lg font-semibold neu-text-loss">{fmt(result.avgMaxDrawdown, 1)}%</p>
+              <p className="font-mono text-base font-semibold neu-text-loss sm:text-lg" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>{fmt(result.avgMaxDrawdown, 1)}%</p>
             </div>
-            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
+            <div className="neu-card-inset p-3" style={{ borderRadius: '1rem', overflow: 'hidden' }}>
               <p className="text-xs neu-text-muted">{t('rm.mcWorstDD')}</p>
-              <p className="font-mono text-lg font-semibold neu-text-loss">{fmt(result.worstMaxDrawdown, 1)}%</p>
+              <p className="font-mono text-base font-semibold neu-text-loss sm:text-lg" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>{fmt(result.worstMaxDrawdown, 1)}%</p>
             </div>
           </div>
 
           <div className="neu-card-inset p-3" style={{ borderRadius: '0.75rem' }}>
             <p className="mb-2 text-xs neu-text-muted">Percentiles ({t('rm.finalBal')})</p>
-            <div className="grid grid-cols-5 gap-2 text-center">
+            <div className="grid grid-cols-5 gap-1 text-center sm:gap-2">
               {[
                 { label: '5%', val: result.p5 },
                 { label: '25%', val: result.p25 },
@@ -111,9 +112,9 @@ export default function MonteCarloPanel({ trades, system, startingBalance }: Pro
                 { label: '75%', val: result.p75 },
                 { label: '95%', val: result.p95 },
               ].map((p) => (
-                <div key={p.label}>
+                <div key={p.label} style={{ overflow: 'hidden' }}>
                   <p className="text-xs neu-text-muted">{p.label}</p>
-                  <p className="font-mono text-sm font-semibold neu-text-primary">${fmt(p.val, 0)}</p>
+                  <p className="font-mono text-xs font-semibold neu-text-primary sm:text-sm" style={{ overflowWrap: 'break-word', wordBreak: 'break-all' }}>${fmt(p.val, 0)}</p>
                 </div>
               ))}
             </div>

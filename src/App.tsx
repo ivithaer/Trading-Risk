@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Coins, Loader2, CheckCircle2, FlaskConical, Link2 } from 'lucide-react';
+import { Coins, Loader2, CheckCircle2, FlaskConical, Link2, AlertTriangle } from 'lucide-react';
 import type { Settings, Trade, Stats } from '@/types';
 import TestResultsPanel from '@/components/TestResultsPanel';
 import {
@@ -47,6 +47,7 @@ function App() {
   const [test5xAggregate, setTest5xAggregate] = useState<Stats | null>(null);
   const [test5xScore, setTest5xScore] = useState(0);
   const [test5xSaved, setTest5xSaved] = useState(false);
+  const [test5xError, setTest5xError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'simulator' | 'rmTester' | 'mt5'>('simulator');
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
@@ -146,43 +147,53 @@ function App() {
     setTest5xResult(null);
     setTest5xAggregate(null);
     setTest5xSaved(false);
+    setTest5xError(null);
 
-    const allStats: Stats[] = [];
-    for (let i = 0; i < VALIDATION_RUNS; i++) {
-      const { stats: runStats } = runFullSimulation(settings);
-      allStats.push(runStats);
-      setTest5xProgress(i + 1);
-      await new Promise((r) => setTimeout(r, 50));
+    try {
+      const allStats: Stats[] = [];
+      for (let i = 0; i < VALIDATION_RUNS; i++) {
+        const { stats: runStats } = runFullSimulation(settings);
+        allStats.push(runStats);
+        setTest5xProgress(i + 1);
+        await new Promise((r) => setTimeout(r, 50));
+      }
+
+      const aggStats = aggregateStats(allStats);
+      const score = scorePlan(aggStats, settings);
+      const avgBalance = settings.startingBalance + aggStats.netPnl;
+      const name = `${translate(lang, 'common.plan')} ${new Date().toLocaleString(lang)}`;
+
+      setTest5xResult(allStats);
+      setTest5xAggregate(aggStats);
+      setTest5xScore(score);
+
+      try {
+        await savePlan(name, settings, aggStats, avgBalance, settings.maxTrades);
+      } catch (saveErr) {
+        console.error('Save plan failed (non-fatal):', saveErr);
+      }
+
+      const localPlan = {
+        id: crypto.randomUUID(),
+        nickname: name,
+        settings,
+        stats: aggStats,
+        finalBalance: avgBalance,
+        tradeCount: settings.maxTrades,
+        winRate: settings.winRate,
+        score,
+        createdAt: Date.now(),
+      };
+      window.dispatchEvent(new CustomEvent('plan-saved-5x', { detail: localPlan }));
+
+      setTest5xSaved(true);
+      setTimeout(() => setTest5xSaved(false), 5000);
+    } catch (err) {
+      console.error('5x test failed:', err);
+      setTest5xError((err as Error).message || 'Test failed');
+    } finally {
+      setTest5xRunning(false);
     }
-
-    const aggStats = aggregateStats(allStats);
-    const score = scorePlan(aggStats, settings);
-    const avgBalance = settings.startingBalance + aggStats.netPnl;
-    const name = `${translate(lang, 'common.plan')} ${new Date().toLocaleString(lang)}`;
-
-    setTest5xResult(allStats);
-    setTest5xAggregate(aggStats);
-    setTest5xScore(score);
-
-    await savePlan(name, settings, aggStats, avgBalance, settings.maxTrades);
-
-    // Dispatch event so SavedPlansPanel picks up the new local plan
-    const localPlan = {
-      id: crypto.randomUUID(),
-      nickname: name,
-      settings,
-      stats: aggStats,
-      finalBalance: avgBalance,
-      tradeCount: settings.maxTrades,
-      winRate: settings.winRate,
-      score,
-      createdAt: Date.now(),
-    };
-    window.dispatchEvent(new CustomEvent('plan-saved-5x', { detail: localPlan }));
-
-    setTest5xSaved(true);
-    setTest5xRunning(false);
-    setTimeout(() => setTest5xSaved(false), 5000);
   }, [settings, lang]);
 
   const dir = LANGUAGES.find((l) => l.code === lang)?.dir || 'ltr';
@@ -293,6 +304,13 @@ function App() {
                   <span className="text-sm neu-text-secondary">
                     {t('trade.testing', { cur: test5xProgress, total: VALIDATION_RUNS })}
                   </span>
+                </div>
+              )}
+
+              {test5xError && !test5xRunning && (
+                <div className="neu-card neu-bg-loss-soft flex items-center gap-3 p-4">
+                  <AlertTriangle size={18} className="neu-text-loss" />
+                  <span className="text-sm neu-text-loss">{test5xError}</span>
                 </div>
               )}
 

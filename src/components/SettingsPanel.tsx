@@ -2,6 +2,7 @@ import { Plus, Minus, Settings2, Info, ChevronDown } from 'lucide-react';
 import type { Settings, RiskMode, RiskType } from '@/types';
 import { WIN_RATES, TRADE_COUNTS } from '@/types';
 import { useI18n } from '@/lib/i18n';
+import DecimalInput from '@/components/DecimalInput';
 
 interface Props {
   settings: Settings;
@@ -46,7 +47,7 @@ function RiskLevelEditor({
   const { t } = useI18n();
   const update = (index: number, value: number) => {
     const next = [...levels];
-    next[index] = isNaN(value) ? 0 : value;
+    next[index] = value;
     onChange(next);
   };
 
@@ -72,10 +73,9 @@ function RiskLevelEditor({
               {i + 1}
             </span>
             <div className="relative flex-1">
-              <input
-                type="number"
+              <DecimalInput
                 value={level}
-                onChange={(e) => update(i, parseFloat(e.target.value))}
+                onChange={(v) => update(i, v)}
                 className="neu-input w-full px-3 py-1.5 pl-10 text-left font-mono"
               />
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm neu-text-muted">
@@ -122,10 +122,9 @@ export default function SettingsPanel({ settings, onChange }: Props) {
       <div className="space-y-4">
         <div>
           <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('settings.startingBalance')}</label>
-          <input
-            type="number"
+          <DecimalInput
             value={settings.startingBalance}
-            onChange={(e) => update({ startingBalance: parseFloat(e.target.value) || 0 })}
+            onChange={(v) => update({ startingBalance: v })}
             className="neu-input w-full px-4 py-2.5 font-mono"
           />
         </div>
@@ -149,10 +148,9 @@ export default function SettingsPanel({ settings, onChange }: Props) {
         <div>
           <label className="mb-1.5 block text-sm font-medium neu-text-secondary">{t('settings.rrr')}</label>
           <div className="relative">
-            <input
-              type="number"
+            <DecimalInput
               value={settings.rrr}
-              onChange={(e) => update({ rrr: parseFloat(e.target.value) || 0 })}
+              onChange={(v) => update({ rrr: v })}
               className="neu-input w-full px-4 py-2.5 pl-16 font-mono"
               step={0.1}
               min={0}
@@ -214,10 +212,9 @@ export default function SettingsPanel({ settings, onChange }: Props) {
             <label className="mb-1.5 block text-sm font-medium neu-text-secondary">
               {t('settings.fixedRisk')} {settings.riskType === 'percentage' ? '(%)' : '($)'}
             </label>
-            <input
-              type="number"
+            <DecimalInput
               value={settings.fixedRisk}
-              onChange={(e) => update({ fixedRisk: parseFloat(e.target.value) || 0 })}
+              onChange={(v) => update({ fixedRisk: v })}
               className="neu-input w-full px-4 py-2.5 font-mono"
               min={0}
             />
