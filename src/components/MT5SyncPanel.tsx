@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link2, Plus, Trash2, Loader2, Shield, AlertTriangle, RefreshCw, Wallet, TrendingUp, DollarSign, Activity, X } from 'lucide-react';
+import { Link2, Plus, Trash2, Loader2, Shield, AlertTriangle, RefreshCw, Wallet, TrendingUp, DollarSign, Activity, X, History, CheckCircle2 } from 'lucide-react';
 import { supabase, type SavedPlan } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n';
@@ -39,6 +39,9 @@ export default function MT5SyncPanel() {
   const [infoMap, setInfoMap] = useState<Record<string, AccountInfo | null>>({});
   const [infoLoading, setInfoLoading] = useState<Set<string>>(new Set());
   const [infoError, setInfoError] = useState<Record<string, string>>({});
+  const [syncLoading, setSyncLoading] = useState<Set<string>>(new Set());
+  const [syncResult, setSyncResult] = useState<Record<string, { totalDealsFetched: number; closedTradesSynced: number }>>({});
+  const [syncError, setSyncError] = useState<Record<string, string>>({});
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchAccounts = useCallback(async () => {
@@ -115,6 +118,26 @@ export default function MT5SyncPanel() {
     const { error: err } = await supabase.from('mt5_accounts').delete().eq('id', id);
     if (err) { setError(err.message); return; }
     setAccounts((prev) => prev.filter((a) => a.id !== id));
+  };
+
+  const handleSyncHistory = async (accountId: string) => {
+    setSyncLoading((prev) => new Set(prev).add(accountId));
+    setSyncError((prev) => { const n = { ...prev }; delete n[accountId]; return n; });
+    setSyncResult((prev) => { const n = { ...prev }; delete n[accountId]; return n; });
+    try {
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mt5-trade-history`;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (sessionData.session?.access_token) headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+      const res = await fetch(apiUrl, { method: 'POST', headers, body: JSON.stringify({ accountId }) });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+      setSyncResult((prev) => ({ ...prev, [accountId]: { totalDealsFetched: body.totalDealsFetched ?? 0, closedTradesSynced: body.closedTradesSynced ?? 0 } }));
+    } catch (e) {
+      setSyncError((prev) => ({ ...prev, [accountId]: (e as Error).message }));
+    } finally {
+      setSyncLoading((prev) => { const n = new Set(prev); n.delete(accountId); return n; });
+    }
   };
 
   if (!user) {
@@ -211,6 +234,15 @@ export default function MT5SyncPanel() {
                 <p className="text-sm font-bold neu-text-gold">{planName(acc.risk_plan_id)}</p>
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleSyncHistory(acc.metaapi_account_id)}
+                  disabled={syncLoading.has(acc.metaapi_account_id)}
+                  className="neu-text-muted hover:neu-text-gold disabled:opacity-50"
+                  title={t('mt5.syncHistory')}
+                  style={{ touchAction: 'manipulation' }}
+                >
+                  {syncLoading.has(acc.metaapi_account_id) ? <Loader2 size={16} className="animate-spin" /> : <History size={16} />}
+                </button>
                 <button onClick={() => fetchAccountInfo(acc.metaapi_account_id)} className="neu-text-muted hover:neu-text-primary" title={t('mt5.refresh')}>
                   <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
                 </button>
@@ -224,6 +256,26 @@ export default function MT5SyncPanel() {
             </div>
             {isLoading && !info && (<div className="flex items-center justify-center py-6"><Loader2 size={20} className="animate-spin neu-text-gold" /></div>)}
             {err && !info && (<div className="neu-card-inset neu-bg-loss-soft px-3 py-2 text-sm neu-text-loss" style={{ borderRadius: '0.75rem' }}>{err}</div>)}
+            {syncLoading.has(acc.metaapi_account_id) && (
+              <div className="mb-3 flex items-center gap-2 neu-card-inset px-3 py-2" style={{ borderRadius: '0.75rem' }}>
+                <Loader2 size={14} className="animate-spin neu-text-gold" />
+                <span className="text-xs neu-text-secondary">{t('mt5.syncingHistory')}</span>
+              </div>
+            )}
+            {syncResult[acc.metaapi_account_id] && (
+              <div className="mb-3 flex items-center gap-2 neu-card-inset neu-bg-profit-soft px-3 py-2" style={{ borderRadius: '0.75rem' }}>
+                <CheckCircle2 size={14} className="neu-text-profit" />
+                <span className="text-xs neu-text-profit">
+                  {t('mt5.syncSuccess', { count: syncResult[acc.metaapi_account_id].closedTradesSynced })}
+                </span>
+              </div>
+            )}
+            {syncError[acc.metaapi_account_id] && (
+              <div className="mb-3 flex items-center gap-2 neu-card-inset neu-bg-loss-soft px-3 py-2" style={{ borderRadius: '0.75rem' }}>
+                <AlertTriangle size={14} className="neu-text-loss" />
+                <span className="text-xs neu-text-loss">{syncError[acc.metaapi_account_id]}</span>
+              </div>
+            )}
             {info && (
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
                 <div className="neu-card-inset p-3" style={{ borderRadius: '1rem' }}>
