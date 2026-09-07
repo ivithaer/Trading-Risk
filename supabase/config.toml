@@ -1,0 +1,14 @@
+[functions.admin-auth]
+verify_jwt = true
+
+[functions.mt5-account-info]
+verify_jwt = false
+
+[functions.mt5-connect]
+verify_jwt = false
+
+[functions.mt5-trade-history]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
