@@ -1,5 +1,6 @@
-import type { Settings, Trade, Stats, TradeResult } from '@/types';
+import type { Settings, Trade, Stats, TradeResult, RebaseSettings } from '@/types';
 import { WIN_RATES, TRADE_COUNTS } from '@/types';
+import { initRebaseState, checkRebase, isRebaseActive, type RebaseState } from './rebaseEngine';
 
 export const DEFAULT_SETTINGS: Settings = {
   startingBalance: 1000,
@@ -18,6 +19,7 @@ export function calculateRiskAmount(
   settings: Settings,
   balance: number,
   levelIndex: number,
+  baseCapital?: number,
 ): number {
   let baseRisk: number;
   if (settings.riskMode === 'fixed') {
@@ -28,9 +30,11 @@ export function calculateRiskAmount(
     baseRisk = settings.riskLevels[idx];
   }
 
+  const effectiveBase = baseCapital !== undefined ? baseCapital : balance;
+
   let risk: number;
   if (settings.riskType === 'percentage') {
-    risk = (balance * baseRisk) / 100;
+    risk = (effectiveBase * baseRisk) / 100;
   } else {
     risk = baseRisk;
   }
@@ -44,11 +48,14 @@ export function executeTrade(
   currentRiskLevelIndex: number,
   settings: Settings,
   tradeCount: number,
+  baseCapital?: number,
 ): {
   trade: Trade;
   newBalance: number;
   newRiskLevelIndex: number;
   newRiskAmount: number;
+  newBaseCapital: number;
+  rebaseState: RebaseState;
 } {
   const isWin = Math.random() < settings.winRate / 100;
   const pnl = isWin ? currentRiskAmount * settings.rrr : -currentRiskAmount;
@@ -59,7 +66,15 @@ export function executeTrade(
     newLevelIndex = (currentRiskLevelIndex + 1) % settings.riskLevels.length;
   }
 
-  const newRiskAmount = calculateRiskAmount(settings, newBalance, newLevelIndex);
+  let currentBaseCapital = baseCapital !== undefined ? baseCapital : settings.startingBalance;
+  let rebaseState = initRebaseState(currentBaseCapital);
+  if (isRebaseActive(settings.rebase)) {
+    const result = checkRebase(newBalance, rebaseState, settings.rebase);
+    rebaseState = result.state;
+    currentBaseCapital = rebaseState.baseCapital;
+  }
+
+  const newRiskAmount = calculateRiskAmount(settings, newBalance, newLevelIndex, currentBaseCapital);
 
   const trade: Trade = {
     index: tradeCount + 1,
@@ -68,9 +83,10 @@ export function executeTrade(
     pnl,
     balanceAfter: newBalance,
     riskLevelIndex: currentRiskLevelIndex,
+    baseCapitalUsed: currentBaseCapital,
   };
 
-  return { trade, newBalance, newRiskLevelIndex: newLevelIndex, newRiskAmount };
+  return { trade, newBalance, newRiskLevelIndex: newLevelIndex, newRiskAmount, newBaseCapital: currentBaseCapital, rebaseState };
 }
 
 export function computeStats(
@@ -173,20 +189,25 @@ export function runFullSimulation(settings: Settings): {
 } {
   let balance = settings.startingBalance;
   let riskLevelIndex = 0;
+  let baseCapital = settings.startingBalance;
+  let rebaseState = initRebaseState(baseCapital);
   const trades: Trade[] = [];
 
   for (let i = 0; i < settings.maxTrades; i++) {
-    const risk = calculateRiskAmount(settings, balance, riskLevelIndex);
-    const { trade, newBalance, newRiskLevelIndex } = executeTrade(
+    const risk = calculateRiskAmount(settings, balance, riskLevelIndex, baseCapital);
+    const { trade, newBalance, newRiskLevelIndex, newBaseCapital, rebaseState: newRebaseState } = executeTrade(
       balance,
       risk,
       riskLevelIndex,
       settings,
       i,
+      baseCapital,
     );
     trades.push(trade);
     balance = newBalance;
     riskLevelIndex = newRiskLevelIndex;
+    baseCapital = newBaseCapital;
+    rebaseState = newRebaseState;
   }
 
   const stats = computeStats(trades, settings.startingBalance, balance);
@@ -450,6 +471,7 @@ export function runSimulatorMonteCarlo(
   startingBalance: number,
   numSimulations: number,
   largeLossThreshold = 50,
+  rebaseSettings?: RebaseSettings,
 ): SimulatorMonteCarloResult {
   const finalBalances: number[] = [];
   const maxDrawdownPcts: number[] = [];
@@ -466,9 +488,18 @@ export function runSimulatorMonteCarlo(
     let balance = startingBalance;
     let peak = startingBalance;
     let maxDrawdownPct = 0;
+    let baseCapital = startingBalance;
+    let rebaseState = initRebaseState(baseCapital);
 
     for (const trade of shuffled) {
       balance = Math.max(0, balance + trade.pnl);
+
+      if (isRebaseActive(rebaseSettings)) {
+        const result = checkRebase(balance, rebaseState, rebaseSettings);
+        rebaseState = result.state;
+        baseCapital = rebaseState.baseCapital;
+      }
+
       peak = Math.max(peak, balance);
       const dd = peak - balance;
       const ddPct = peak > 0 ? (dd / peak) * 100 : 0;

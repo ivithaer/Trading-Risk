@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Dices, Loader2, Target, AlertTriangle, Info } from 'lucide-react';
 import type { BacktestTrade, RiskSystem, MonteCarloResult } from '@/lib/rmTypes';
+import type { RebaseSettings } from '@/types';
 import { runMonteCarlo } from '@/lib/rmEngine';
 import { useI18n } from '@/lib/i18n';
 import DecimalInput from '@/components/DecimalInput';
@@ -9,6 +10,7 @@ interface Props {
   trades: BacktestTrade[];
   system: RiskSystem | null;
   startingBalance: number;
+  rebaseSettings?: RebaseSettings;
 }
 
 const RUN_OPTIONS = [100, 500, 1000, 5000, 10000];
@@ -18,7 +20,7 @@ function fmt(n: number, dec = 2): string {
   return n.toFixed(dec);
 }
 
-export default function MonteCarloPanel({ trades, system, startingBalance }: Props) {
+export default function MonteCarloPanel({ trades, system, startingBalance, rebaseSettings }: Props) {
   const { t } = useI18n();
   const [numRuns, setNumRuns] = useState(1000);
   const [goal, setGoal] = useState(0);
@@ -33,7 +35,7 @@ export default function MonteCarloPanel({ trades, system, startingBalance }: Pro
     const goalNum = goal > 0 ? goal : undefined;
     const ddNum = ddLimit > 0 ? ddLimit : undefined;
     await new Promise((r) => setTimeout(r, 50));
-    const mc = runMonteCarlo(trades, system, startingBalance, numRuns, goalNum, ddNum);
+    const mc = runMonteCarlo(trades, system, startingBalance, numRuns, goalNum, ddNum, rebaseSettings);
     setResult(mc);
     setRunning(false);
   };

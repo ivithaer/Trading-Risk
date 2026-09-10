@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Dices, Loader2, TrendingUp, AlertTriangle, Shield, BarChart3, Info } from 'lucide-react';
-import type { Trade } from '@/types';
+import type { Trade, RebaseSettings } from '@/types';
 import { runSimulatorMonteCarlo, formatCurrency, formatNumber, type SimulatorMonteCarloResult } from '@/lib/riskEngine';
 import { useI18n } from '@/lib/i18n';
 
 interface Props {
   trades: Trade[];
   startingBalance: number;
+  rebaseSettings?: RebaseSettings;
 }
 
 const MIN_TRADES = 10;
@@ -96,7 +97,7 @@ function Histogram({ data, bins, color, label, startingBalance }: {
   );
 }
 
-export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Props) {
+export default function MonteCarloSimulatorPanel({ trades, startingBalance, rebaseSettings }: Props) {
   const { t } = useI18n();
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<SimulatorMonteCarloResult | null>(null);
@@ -109,7 +110,7 @@ export default function MonteCarloSimulatorPanel({ trades, startingBalance }: Pr
     setRunning(true);
     setResult(null);
     await new Promise((r) => setTimeout(r, 50));
-    const mc = runSimulatorMonteCarlo(trades, startingBalance, numSimulations);
+    const mc = runSimulatorMonteCarlo(trades, startingBalance, numSimulations, 50, rebaseSettings);
     setResult(mc);
     setRunning(false);
   };

@@ -1,8 +1,9 @@
-import { Plus, Minus, Settings2, Info, ChevronDown } from 'lucide-react';
-import type { Settings, RiskMode, RiskType } from '@/types';
-import { WIN_RATES, TRADE_COUNTS } from '@/types';
+import { Plus, Minus, Settings2, Info, ChevronDown, GitBranch } from 'lucide-react';
+import type { Settings, RiskMode, RiskType, RebaseSettings } from '@/types';
+import { WIN_RATES, TRADE_COUNTS, DEFAULT_REBASE_SETTINGS } from '@/types';
 import { useI18n } from '@/lib/i18n';
 import DecimalInput from '@/components/DecimalInput';
+import RebasePanel from '@/components/RebasePanel';
 
 interface Props {
   settings: Settings;
@@ -220,6 +221,17 @@ export default function SettingsPanel({ settings, onChange }: Props) {
             />
           </div>
         )}
+
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <GitBranch size={16} className="neu-text-gold" />
+            <span className="text-sm font-semibold neu-text-secondary">{t('rebase.title')}</span>
+          </div>
+          <RebasePanel
+            settings={settings.rebase ?? DEFAULT_REBASE_SETTINGS}
+            onChange={(rebase: RebaseSettings) => update({ rebase })}
+          />
+        </div>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import {
   aggregateStats,
   scorePlan,
 } from '@/lib/riskEngine';
+import { isRebaseActive } from '@/lib/rebaseEngine';
 import { savePlan } from '@/lib/supabaseClient';
 import { I18nContext, translate, type Lang, type TFunc } from '@/lib/i18n';
 import { LANGUAGES } from '@/lib/i18n';
@@ -38,6 +39,7 @@ function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [balance, setBalance] = useState(DEFAULT_SETTINGS.startingBalance);
+  const [baseCapital, setBaseCapital] = useState(DEFAULT_SETTINGS.startingBalance);
   const [riskLevelIndex, setRiskLevelIndex] = useState(0);
   const [lastPnl, setLastPnl] = useState<number | null>(null);
   const [autoRun, setAutoRun] = useState(false);
@@ -64,11 +66,12 @@ function App() {
     [lang],
   );
 
-  const stateRef = useRef({ trades, balance, riskLevelIndex, settings });
-  stateRef.current = { trades, balance, riskLevelIndex, settings };
+  const stateRef = useRef({ trades, balance, baseCapital, riskLevelIndex, settings });
+  stateRef.current = { trades, balance, baseCapital, riskLevelIndex, settings };
 
   const isComplete = trades.length >= settings.maxTrades;
-  const currentRiskAmount = calculateRiskAmount(settings, balance, riskLevelIndex);
+  const rebaseOn = isRebaseActive(settings.rebase);
+  const currentRiskAmount = calculateRiskAmount(settings, balance, riskLevelIndex, rebaseOn ? baseCapital : undefined);
   const stats = computeStats(trades, settings.startingBalance, balance);
   const lastResult = trades.length > 0 ? trades[trades.length - 1].result : null;
 
@@ -76,18 +79,21 @@ function App() {
     const s = stateRef.current;
     if (s.trades.length >= s.settings.maxTrades) return false;
 
-    const risk = calculateRiskAmount(s.settings, s.balance, s.riskLevelIndex);
-    const { trade, newBalance, newRiskLevelIndex } = executeTrade(
+    const rebaseOn = isRebaseActive(s.settings.rebase);
+    const risk = calculateRiskAmount(s.settings, s.balance, s.riskLevelIndex, rebaseOn ? s.baseCapital : undefined);
+    const { trade, newBalance, newRiskLevelIndex, newBaseCapital } = executeTrade(
       s.balance,
       risk,
       s.riskLevelIndex,
       s.settings,
       s.trades.length,
+      rebaseOn ? s.baseCapital : undefined,
     );
 
     setTrades((prev) => [...prev, trade]);
     setBalance(newBalance);
     setRiskLevelIndex(newRiskLevelIndex);
+    if (rebaseOn) setBaseCapital(newBaseCapital);
     setLastPnl(trade.pnl);
     return true;
   }, []);
@@ -118,6 +124,7 @@ function App() {
     setTest5xSaved(false);
     setTrades([]);
     setBalance(settings.startingBalance);
+    setBaseCapital(settings.startingBalance);
     setRiskLevelIndex(0);
     setLastPnl(null);
   }, [settings.startingBalance]);
@@ -132,6 +139,7 @@ function App() {
     setSettings(newSettings);
     setTrades([]);
     setBalance(newSettings.startingBalance);
+    setBaseCapital(newSettings.startingBalance);
     setRiskLevelIndex(0);
     setLastPnl(null);
   }, []);
@@ -281,6 +289,7 @@ function App() {
                 currentRiskAmount={currentRiskAmount}
                 tradeCount={trades.length}
                 maxTrades={settings.maxTrades}
+                baseCapital={rebaseOn ? baseCapital : undefined}
               />
               <div className="neu-card p-6">
                 <TradeButton
@@ -333,7 +342,7 @@ function App() {
               )}
 
               <EquityCurve trades={trades} startingBalance={settings.startingBalance} />
-              <MonteCarloSimulatorPanel trades={trades} startingBalance={settings.startingBalance} />
+              <MonteCarloSimulatorPanel trades={trades} startingBalance={settings.startingBalance} rebaseSettings={settings.rebase} />
             </div>
 
             <div className="space-y-5 lg:col-span-4">

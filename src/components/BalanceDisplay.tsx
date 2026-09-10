@@ -11,6 +11,7 @@ interface Props {
   currentRiskAmount: number;
   tradeCount: number;
   maxTrades: number;
+  baseCapital?: number;
 }
 
 export default function BalanceDisplay({
@@ -21,6 +22,7 @@ export default function BalanceDisplay({
   currentRiskAmount,
   tradeCount,
   maxTrades,
+  baseCapital,
 }: Props) {
   const { t } = useI18n();
   const netPnl = balance - startingBalance;
@@ -85,6 +87,14 @@ export default function BalanceDisplay({
               {tradeCount} / {maxTrades}
             </span>
           </div>
+          {baseCapital !== undefined && baseCapital !== startingBalance && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="neu-text-secondary">{t('rebase.currentBase')}</span>
+              <span className="font-mono font-semibold neu-text-gold">
+                {formatCurrency(baseCapital)}
+              </span>
+            </div>
+          )}
           <div className="neu-track h-2 overflow-hidden p-px">
             <div
               className="h-full rounded-full transition-all duration-500"

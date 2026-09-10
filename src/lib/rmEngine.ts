@@ -9,6 +9,8 @@ import type {
   MonteCarloResult,
   Betreatment,
 } from './rmTypes';
+import type { RebaseSettings } from '@/types';
+import { initRebaseState, checkRebase, isRebaseActive, type RebaseState } from './rebaseEngine';
 
 export function computeStrategyStats(trades: BacktestTrade[]): StrategyStats {
   const total = trades.length;
@@ -154,9 +156,12 @@ export function runSimulation(
   startingBalance: number,
   goal?: number,
   maxDrawdownLimit?: number,
+  rebaseSettings?: RebaseSettings,
 ): SimResult {
   let balance = startingBalance;
   let peak = startingBalance;
+  let baseCapital = startingBalance;
+  let rebaseState = initRebaseState(baseCapital);
   let currentRisk = system.baseRiskPct;
   let consecutiveWins = 0;
   let consecutiveLosses = 0;
@@ -194,9 +199,11 @@ export function runSimulation(
 
     let riskAmount: number;
     if (system.calcMethod === 'currentBalance') {
-      riskAmount = (balance * riskPct) / 100;
+      const effectiveBase = isRebaseActive(rebaseSettings) ? baseCapital : balance;
+      riskAmount = (effectiveBase * riskPct) / 100;
     } else if (system.calcMethod === 'initialBalance') {
-      riskAmount = (startingBalance * riskPct) / 100;
+      const effectiveBase = isRebaseActive(rebaseSettings) ? baseCapital : startingBalance;
+      riskAmount = (effectiveBase * riskPct) / 100;
     } else {
       riskAmount = system.costs.fixedCost > 0 ? system.costs.fixedCost : balance * 0.01;
     }
@@ -268,6 +275,12 @@ export function runSimulation(
     simTrades.push(simTrade);
 
     balance = balanceAfter;
+
+    if (isRebaseActive(rebaseSettings)) {
+      const result = checkRebase(balance, rebaseState, rebaseSettings);
+      rebaseState = result.state;
+      baseCapital = rebaseState.baseCapital;
+    }
 
     // Now determine risk for NEXT trade
     const drawdownPct = ddPct;
@@ -373,6 +386,7 @@ export function runMonteCarlo(
   numSimulations: number,
   goal?: number,
   maxDrawdownLimit?: number,
+  rebaseSettings?: RebaseSettings,
 ): MonteCarloResult {
   const finalBalances: number[] = [];
   const maxDrawdowns: number[] = [];
@@ -386,7 +400,7 @@ export function runMonteCarlo(
       [shuffled[j], shuffled[k]] = [shuffled[k], shuffled[j]];
     }
 
-    const result = runSimulation(shuffled, system, startingBalance, goal, maxDrawdownLimit);
+    const result = runSimulation(shuffled, system, startingBalance, goal, maxDrawdownLimit, rebaseSettings);
     finalBalances.push(result.finalBalance);
     maxDrawdowns.push(result.maxDrawdownPct);
     if (result.hitGoal) hitGoalCount++;

@@ -5,6 +5,22 @@ export type TradeResult = 'win' | 'loss';
 export const WIN_RATES = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90];
 export const TRADE_COUNTS = [20, 50, 100, 200, 500, 1000];
 
+export interface RebaseSettings {
+  enabled: boolean;
+  upwardEnabled: boolean;
+  downwardEnabled: boolean;
+  upwardMilestones: number[];
+  downwardMilestones: number[];
+}
+
+export const DEFAULT_REBASE_SETTINGS: RebaseSettings = {
+  enabled: false,
+  upwardEnabled: false,
+  downwardEnabled: false,
+  upwardMilestones: [],
+  downwardMilestones: [],
+};
+
 export interface Settings {
   startingBalance: number;
   winRate: number;
@@ -14,6 +30,7 @@ export interface Settings {
   fixedRisk: number;
   riskLevels: number[];
   maxTrades: number;
+  rebase?: RebaseSettings;
 }
 
 export interface Trade {
@@ -23,6 +40,7 @@ export interface Trade {
   pnl: number;
   balanceAfter: number;
   riskLevelIndex: number;
+  baseCapitalUsed?: number;
 }
 
 export interface Stats {

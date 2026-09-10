@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
-import { Wallet, Play, ListChecks, Table2, Dices } from 'lucide-react';
+import { Wallet, Play, ListChecks, Table2, Dices, GitBranch } from 'lucide-react';
 import type { BacktestTrade, RiskSystem, SimResult, StrategyStats as StratStats } from '@/lib/rmTypes';
+import type { RebaseSettings } from '@/types';
+import { DEFAULT_REBASE_SETTINGS } from '@/types';
 import { computeStrategyStats, runSimulation } from '@/lib/rmEngine';
 import { useI18n } from '@/lib/i18n';
 import DecimalInput from '@/components/DecimalInput';
@@ -11,6 +13,7 @@ import ComparisonTable from '@/components/rm/ComparisonTable';
 import EquityCurves from '@/components/rm/EquityCurves';
 import TradeDetailTable from '@/components/rm/TradeDetailTable';
 import MonteCarloPanel from '@/components/rm/MonteCarloPanel';
+import RebasePanel from '@/components/RebasePanel';
 
 export default function RiskManagementPage() {
   const { t } = useI18n();
@@ -21,6 +24,7 @@ export default function RiskManagementPage() {
   const [selectedSysId, setSelectedSysId] = useState<string | null>(null);
   const [goal, setGoal] = useState(0);
   const [ddLimit, setDdLimit] = useState(0);
+  const [rebaseSettings, setRebaseSettings] = useState<RebaseSettings>(DEFAULT_REBASE_SETTINGS);
 
   const strategyStats: StratStats = useMemo(() => computeStrategyStats(trades), [trades]);
 
@@ -30,7 +34,7 @@ export default function RiskManagementPage() {
   const handleRunAll = () => {
     const goalNum = goal > 0 ? goal : undefined;
     const ddNum = ddLimit > 0 ? ddLimit : undefined;
-    const simResults = systems.map((sys) => runSimulation(trades, sys, startingBalance, goalNum, ddNum));
+    const simResults = systems.map((sys) => runSimulation(trades, sys, startingBalance, goalNum, ddNum, rebaseSettings));
     setResults(simResults);
     if (simResults.length > 0) setSelectedSysId(simResults[0].systemId);
   };
@@ -105,6 +109,16 @@ export default function RiskManagementPage() {
         </div>
       )}
 
+      {trades.length > 0 && systems.length > 0 && (
+        <div className="neu-card p-5">
+          <div className="mb-3 flex items-center gap-2">
+            <GitBranch size={18} className="neu-text-gold" />
+            <h2 className="text-base font-semibold neu-text-primary">{t('rebase.title')}</h2>
+          </div>
+          <RebasePanel settings={rebaseSettings} onChange={setRebaseSettings} />
+        </div>
+      )}
+
       {results.length > 0 && <ComparisonTable results={results} />}
       {results.length > 0 && <EquityCurves results={results} />}
 
@@ -140,7 +154,7 @@ export default function RiskManagementPage() {
             <Dices size={18} className="neu-text-gold" />
             <h2 className="text-sm font-semibold neu-text-secondary">{t('rm.monteCarlo')}</h2>
           </div>
-          <MonteCarloPanel trades={trades} system={selectedSystem} startingBalance={startingBalance} />
+          <MonteCarloPanel trades={trades} system={selectedSystem} startingBalance={startingBalance} rebaseSettings={rebaseSettings} />
         </div>
       )}
     </div>
